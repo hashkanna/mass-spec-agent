@@ -1,0 +1,170 @@
+note: >-
+  Gold studies are defined by explicit SQL rules over the raw curated SDRF values (sample_attributes,
+  assays, modifications), written by hand and independently of msagent's vocabulary. They measure
+  whether a natural-language question is turned into the right structured selection, compared with
+  text retrieval over the same per-study metadata. They are not expert relevance judgments, and the
+  questions were written while msagent was being built, so this is not a blind test. Add
+  researcher-reviewed accessions under must_include to strengthen it.
+
+# gold_sql may use the views sa(accession, source_name, a, v), runs(accession, source_name, instrument,
+# label, acq, file_format), mods(accession, name, targets, unimod) and proj (= projects). Values are
+# lower-cased. A rule may start with ", name AS (...)" to add its own CTEs.
+queries:
+  - id: liver_tumour_paired
+    question: "Human liver tumour proteomics with paired non-tumour tissue, at least ten patients, accessible raw files. Exclude cell lines."
+    gold_rule: human liver samples; >=10 annotated individuals each having a tumour and a normal/non-tumour sample
+    gold_sql: |
+      , s AS (
+        SELECT accession, source_name,
+          bool_or(a = 'organism part' AND v LIKE '%liver%') AS liver,
+          bool_or(a = 'organism' AND v LIKE 'homo sapiens%') AS human,
+          bool_or(a IN ('disease','phenotype','sample type','condition','specimen','tissue type')
+                  AND regexp_matches(v, '(^|[^a-z])(normal|healthy|adjacent|non-?tumou?r|para-?(tumou?r|cancer))')) AS nrm,
+          bool_or(a IN ('disease','phenotype','sample type','condition','specimen','tissue type')
+                  AND regexp_matches(v, 'carcinoma|cancer|tumou?r|hcc|adenoma|neoplas') AND NOT regexp_matches(v, 'non-?tumou?r')) AS tum,
+          max(CASE WHEN a = 'individual' AND v NOT IN ('pooled', 'not available', 'not applicable') THEN v END) AS ind
+        FROM sa GROUP BY accession, source_name)
+      SELECT accession FROM (
+        SELECT accession, ind FROM s WHERE liver AND human AND ind IS NOT NULL
+        GROUP BY accession, ind HAVING bool_or(nrm) AND bool_or(tum AND NOT nrm))
+      GROUP BY accession HAVING count(*) >= 10
+
+  - id: plasma_tmt
+    question: "Human plasma proteomics quantified with TMT"
+    gold_rule: human; organism part contains 'plasma' (not seminal); TMT channel labels
+    gold_sql: |
+      SELECT accession FROM sa WHERE a = 'organism' AND v LIKE 'homo sapiens%'
+      INTERSECT SELECT accession FROM sa WHERE a = 'organism part' AND v LIKE '%plasma%' AND v NOT LIKE '%seminal%' AND v NOT LIKE '%membrane%'
+      INTERSECT SELECT accession FROM runs WHERE label LIKE 'tmt%'
+
+  - id: csf_alzheimer_controls
+    question: "Alzheimer's disease cerebrospinal fluid proteomics comparing patients with healthy controls"
+    gold_rule: CSF samples; an Alzheimer's annotation; a normal/healthy/control annotation
+    gold_sql: |
+      SELECT accession FROM sa WHERE a = 'organism part' AND regexp_matches(v, 'cerebrospinal|(^|[^a-z])csf')
+      INTERSECT SELECT accession FROM sa WHERE regexp_matches(v, 'alzheimer')
+      INTERSECT SELECT accession FROM sa WHERE a IN ('disease','phenotype','condition','sample type','diagnosis') AND regexp_matches(v, '(^|[^a-z])(normal|healthy|control)')
+
+  - id: astral_plasma
+    question: "Orbitrap Astral datasets of human blood plasma"
+    gold_rule: Astral runs; human; organism part contains 'plasma'
+    gold_sql: |
+      SELECT accession FROM runs WHERE instrument LIKE '%astral%'
+      INTERSECT SELECT accession FROM sa WHERE a = 'organism part' AND v LIKE '%plasma%' AND v NOT LIKE '%seminal%'
+      INTERSECT SELECT accession FROM sa WHERE a = 'organism' AND v LIKE 'homo sapiens%'
+
+  - id: timstof_dia_mouse_brain
+    question: "DIA timsTOF data from mouse brain"
+    gold_rule: timsTOF + data-independent runs; mouse; brain region
+    gold_sql: |
+      SELECT accession FROM runs WHERE instrument LIKE '%timstof%' AND regexp_matches(acq, 'independent|dia')
+      INTERSECT SELECT accession FROM sa WHERE a = 'organism' AND v LIKE 'mus musculus%'
+      INTERSECT SELECT accession FROM sa WHERE a = 'organism part' AND regexp_matches(v, 'brain|cortex|hippocamp|cerebell|striatum|hypothalamus|thalamus')
+
+  - id: tmt_phospho_cancer
+    question: "TMT phosphoproteomics with phosphopeptide enrichment in human cancer cells"
+    gold_rule: TMT; phospho enrichment annotated; human; cancer disease annotation
+    gold_sql: |
+      SELECT accession FROM runs WHERE label LIKE 'tmt%'
+      INTERSECT SELECT accession FROM sa WHERE a = 'enrichment process' AND regexp_matches(v, 'phospho|imac|tio2')
+      INTERSECT SELECT accession FROM sa WHERE a = 'organism' AND v LIKE 'homo sapiens%'
+      INTERSECT SELECT accession FROM sa WHERE a = 'disease' AND regexp_matches(v, 'carcinoma|cancer|tumou?r|sarcoma|lymphoma|leuka?emia|melanoma|glioma|blastoma|myeloma')
+
+  - id: ubiquitinome
+    question: "Ubiquitinome profiling with diGly remnant enrichment"
+    gold_rule: GlyGly (UNIMOD:121) searched or ubiquitin enrichment annotated
+    gold_sql: |
+      SELECT accession FROM mods WHERE name IN ('gg', 'glygly', 'gly-gly') OR unimod = 'UNIMOD:121'
+      UNION SELECT accession FROM sa WHERE a = 'enrichment process' AND regexp_matches(v, 'ubiquit|digly|k-gg|gg-')
+
+  - id: silac_hela
+    question: "SILAC proteomics in HeLa cells"
+    gold_rule: SILAC labels; HeLa named in any sample attribute
+    gold_sql: |
+      SELECT accession FROM runs WHERE label LIKE '%silac%'
+      INTERSECT SELECT accession FROM sa WHERE regexp_matches(v, '(^|[^a-z])hela')
+
+  - id: covid_serum_plasma
+    question: "COVID-19 patient serum or plasma proteomics"
+    gold_rule: COVID-19/SARS-CoV-2 annotation; serum or plasma samples
+    gold_sql: |
+      SELECT accession FROM sa WHERE regexp_matches(v, 'covid|sars-cov-?2')
+      INTERSECT SELECT accession FROM sa WHERE a = 'organism part' AND regexp_matches(v, 'plasma|serum') AND v NOT LIKE '%seminal%'
+
+  - id: mouse_liver_knockout
+    question: "Liver proteomics of knockout mice versus wild-type"
+    gold_rule: mouse; liver; genotype includes wild type and at least one other genotype
+    gold_sql: |
+      SELECT accession FROM sa WHERE a = 'organism' AND v LIKE 'mus musculus%'
+      INTERSECT SELECT accession FROM sa WHERE a = 'organism part' AND v LIKE '%liver%'
+      INTERSECT SELECT accession FROM sa WHERE a IN ('genotype', 'genetic modification', 'phenotype') AND regexp_matches(v, 'wild[ -]?type|(^|[^a-z])wt([^a-z]|$)')
+      INTERSECT SELECT accession FROM sa WHERE a IN ('genotype', 'genetic modification') AND NOT regexp_matches(v, 'wild[ -]?type|(^|[^a-z])wt([^a-z]|$)')
+
+  - id: urine_large
+    question: "Human urine proteomics with at least 50 samples"
+    gold_rule: human; urine; >= 50 samples in the study
+    gold_sql: |
+      SELECT accession FROM sa WHERE a = 'organism part' AND v LIKE '%urin%'
+      INTERSECT SELECT accession FROM sa WHERE a = 'organism' AND v LIKE 'homo sapiens%'
+      INTERSECT SELECT accession FROM proj WHERE n_samples >= 50
+
+  - id: drug_vs_dmso_tmt_cell_lines
+    question: "TMT proteomics of cell lines treated with a drug compared with DMSO vehicle control"
+    gold_rule: TMT; cell-line annotation; treatment/compound has a control level and a non-control level
+    gold_sql: |
+      SELECT accession FROM runs WHERE label LIKE 'tmt%'
+      INTERSECT SELECT accession FROM sa WHERE a IN ('treatment', 'compound') AND regexp_matches(v, 'dmso|vehicle|control|untreated|mock')
+      INTERSECT SELECT accession FROM sa WHERE a IN ('treatment', 'compound') AND NOT regexp_matches(v, 'dmso|vehicle|control|untreated|mock')
+      INTERSECT SELECT accession FROM sa WHERE a IN ('cell line', 'cellosaurus name')
+
+  - id: arabidopsis_dia
+    question: "Arabidopsis proteome measured with data-independent acquisition"
+    gold_rule: Arabidopsis; data-independent runs
+    gold_sql: |
+      SELECT accession FROM sa WHERE a = 'organism' AND v LIKE 'arabidopsis%'
+      INTERSECT SELECT accession FROM runs WHERE regexp_matches(acq, 'independent')
+
+  - id: glycoproteomics
+    question: "Glycoproteomics with glycopeptide enrichment"
+    gold_rule: glyco/lectin/HILIC enrichment annotated, or a glycan modification searched
+    gold_sql: |
+      SELECT accession FROM sa WHERE a = 'enrichment process' AND regexp_matches(v, 'glyco|lectin|hilic')
+      UNION SELECT accession FROM mods WHERE regexp_matches(name, 'hexnac|hex\(|^hex$|glyco')
+
+  - id: heart_failure_vs_donor
+    question: "Human heart tissue proteomics in heart failure or cardiomyopathy versus non-failing donor hearts"
+    gold_rule: human; heart tissue; heart failure/cardiomyopathy annotation; a normal/control/non-failing/donor annotation
+    gold_sql: |
+      SELECT accession FROM sa WHERE a = 'organism' AND v LIKE 'homo sapiens%'
+      INTERSECT SELECT accession FROM sa WHERE a = 'organism part' AND regexp_matches(v, 'heart|ventric|atri|myocard|cardiac')
+      INTERSECT SELECT accession FROM sa WHERE regexp_matches(v, 'heart failure|cardiomyopathy|hfpef|hfref')
+      INTERSECT SELECT accession FROM sa WHERE a IN ('disease', 'phenotype', 'condition') AND regexp_matches(v, '(^|[^a-z])(normal|healthy|control|non-failing|donor)')
+
+  - id: single_cell
+    question: "Single-cell proteomics datasets"
+    gold_rule: SDRF single-cell template, or sample type 'single cell'
+    gold_sql: |
+      SELECT accession FROM proj WHERE list_contains(templates, 'single-cell')
+      UNION SELECT accession FROM sa WHERE a = 'sample type' AND v = 'single cell'
+
+  - id: ecoli_lfq_qexactive
+    question: "E. coli label-free proteomics on a Q Exactive"
+    gold_rule: E. coli; label-free runs; Q Exactive family
+    gold_sql: |
+      SELECT accession FROM sa WHERE a = 'organism' AND v LIKE 'escherichia coli%'
+      INTERSECT SELECT accession FROM runs WHERE label LIKE '%label free%'
+      INTERSECT SELECT accession FROM runs WHERE instrument LIKE '%q exactive%'
+
+  - id: ovarian_cancer_tmt
+    question: "Ovarian cancer tumour tissue profiled with TMT"
+    gold_rule: ovarian cancer disease annotation; TMT labels
+    gold_sql: |
+      SELECT accession FROM sa WHERE a = 'disease' AND regexp_matches(v, 'ovar') AND regexp_matches(v, 'cancer|carcinoma|neoplasm|tumou?r')
+      INTERSECT SELECT accession FROM runs WHERE label LIKE 'tmt%'
+
+  - id: breast_cancer_dia
+    question: "Breast cancer proteomics with DIA / SWATH acquisition"
+    gold_rule: breast cancer disease annotation; data-independent runs
+    gold_sql: |
+      SELECT accession FROM sa WHERE a = 'disease' AND regexp_matches(v, 'breast') AND regexp_matches(v, 'cancer|carcinoma|tumou?r|neoplasm')
+      INTERSECT SELECT accession FROM runs WHERE regexp_matches(acq, 'independent|swath')

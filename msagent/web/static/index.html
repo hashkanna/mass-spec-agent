@@ -1,0 +1,377 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mass-Spec Agent</title>
+<style>
+:root {
+  --bg: #f7f7f5; --panel: #ffffff; --ink: #1d1f23; --muted: #646a73; --line: #e2e3e0;
+  --accent: #2456c8; --accent-ink: #ffffff; --ok: #1f8a4c; --ok-bg: #e5f4ea; --bad: #c0392b; --bad-bg: #fbe9e7;
+  --unk: #8a6d00; --unk-bg: #fbf3d6; --chip: #eef1f8; --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #15171a; --panel: #1d2024; --ink: #e8e9eb; --muted: #9aa0a8; --line: #2e3238;
+    --accent: #6d95f2; --accent-ink: #0d1424; --ok: #5cc98a; --ok-bg: #1b3326; --bad: #f08a7e; --bad-bg: #3a1f1c;
+    --unk: #e3c560; --unk-bg: #3a3218; --chip: #262b33;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
+header { display: flex; align-items: baseline; gap: 16px; padding: 14px 20px; border-bottom: 1px solid var(--line); background: var(--panel); flex-wrap: wrap; }
+header h1 { font-size: 17px; margin: 0; letter-spacing: .2px; }
+header .sub { color: var(--muted); font-size: 12.5px; }
+nav { display: flex; gap: 4px; margin-left: auto; }
+nav button { background: none; border: 1px solid transparent; color: var(--muted); padding: 5px 12px; border-radius: 6px; cursor: pointer; font: inherit; }
+nav button.on { color: var(--ink); border-color: var(--line); background: var(--bg); }
+main { max-width: 1240px; margin: 0 auto; padding: 18px 16px 90px; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; margin-bottom: 14px; }
+textarea { width: 100%; min-height: 64px; resize: vertical; font: inherit; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--ink); }
+.row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.btn { background: var(--accent); color: var(--accent-ink); border: 0; border-radius: 7px; padding: 8px 16px; font: inherit; font-weight: 600; cursor: pointer; }
+.btn.ghost { background: none; color: var(--accent); border: 1px solid var(--line); font-weight: 500; }
+.btn:disabled { opacity: .5; cursor: default; }
+.ex { background: var(--chip); border: 0; color: var(--ink); border-radius: 999px; padding: 4px 10px; font: inherit; font-size: 12.5px; cursor: pointer; }
+.label { font-size: 11.5px; text-transform: uppercase; letter-spacing: .6px; color: var(--muted); margin: 0 0 6px; }
+.crit { display: inline-flex; align-items: center; gap: 6px; background: var(--chip); border-radius: 6px; padding: 4px 6px 4px 9px; margin: 0 6px 6px 0; font-size: 13px; }
+.crit.safety, .crit.ranking { opacity: .75; }
+.crit button { border: 0; background: none; color: var(--muted); cursor: pointer; font-size: 14px; line-height: 1; padding: 0 3px; }
+.summary { color: var(--muted); font-size: 13px; margin: 2px 0 10px; }
+table { width: 100%; border-collapse: collapse; }
+th { text-align: left; font-weight: 600; font-size: 12px; color: var(--muted); padding: 6px 8px; border-bottom: 1px solid var(--line); }
+td { padding: 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+tr.res { cursor: pointer; }
+tr.res:hover td { background: var(--bg); }
+.acc { font-family: var(--mono); font-weight: 600; white-space: nowrap; }
+.pill { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+.pill.qualifies { background: var(--ok-bg); color: var(--ok); }
+.pill.review { background: var(--unk-bg); color: var(--unk); }
+.pill.excluded { background: var(--bad-bg); color: var(--bad); }
+.cells { display: flex; gap: 3px; flex-wrap: wrap; }
+.cell { width: 15px; height: 15px; border-radius: 3px; font-size: 10px; line-height: 15px; text-align: center; font-weight: 700; }
+.cell.confirmed { background: var(--ok-bg); color: var(--ok); }
+.cell.excluded { background: var(--bad-bg); color: var(--bad); }
+.cell.unknown { background: var(--unk-bg); color: var(--unk); }
+.design { font-size: 13px; }
+.muted { color: var(--muted); }
+.links a { color: var(--accent); text-decoration: none; margin-right: 8px; font-size: 12.5px; }
+.detail td { background: var(--bg); }
+.check { display: grid; grid-template-columns: 22px 170px 1fr; gap: 6px; padding: 3px 0; font-size: 13px; }
+.check .ic { font-weight: 700; text-align: center; }
+.check .ic.confirmed { color: var(--ok); } .check .ic.excluded { color: var(--bad); } .check .ic.unknown { color: var(--unk); }
+.hint { color: var(--muted); font-style: italic; }
+.src { color: var(--muted); font-size: 11.5px; }
+.files { margin-top: 10px; border-top: 1px dashed var(--line); padding-top: 10px; }
+.files input { font: inherit; padding: 5px 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); color: var(--ink); min-width: 240px; }
+.mono { font-family: var(--mono); font-size: 12px; word-break: break-all; }
+.small { font-size: 12.5px; }
+.bar { position: fixed; left: 0; right: 0; bottom: 0; background: var(--panel); border-top: 1px solid var(--line); padding: 10px 20px; display: none; }
+.bar.on { display: block; }
+.bar .row { max-width: 1240px; margin: 0 auto; }
+#mapwrap { position: relative; }
+canvas { width: 100%; height: 640px; display: block; border-radius: 8px; background: var(--bg); }
+#tip { position: absolute; pointer-events: none; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 6px 8px; font-size: 12px; display: none; max-width: 300px; box-shadow: 0 2px 8px rgba(0,0,0,.12); }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 12px; margin-top: 8px; }
+.legend span i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 5px; vertical-align: -1px; }
+select { font: inherit; padding: 5px 8px; border-radius: 6px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); }
+.spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid var(--line); border-top-color: var(--accent); border-radius: 50%; animation: spin .8s linear infinite; vertical-align: -2px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.benchbar { height: 8px; background: var(--accent); border-radius: 4px; }
+.hidden { display: none !important; }
+@media (max-width: 760px) {
+  .hide-sm { display: none; }
+  .check { grid-template-columns: 18px 1fr; }
+  .check .det { grid-column: 1 / -1; }
+  canvas { height: 420px; }
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>Mass-Spec Agent</h1>
+  <span class="sub" id="status">loading index…</span>
+  <nav>
+    <button data-tab="search" class="on">Cohort search</button>
+    <button data-tab="map">Study map</button>
+    <button data-tab="bench">Benchmark</button>
+  </nav>
+</header>
+<main>
+  <section id="tab-search">
+    <div class="panel">
+      <p class="label">Describe the experiment you want to run</p>
+      <textarea id="q" placeholder="e.g. human liver tumour with paired non-tumour tissue, at least 10 patients, raw files, exclude cell lines"></textarea>
+      <div class="row" style="margin-top:8px">
+        <button class="btn" id="go">Find cohorts</button>
+        <span id="busy" class="hidden"><span class="spinner"></span></span>
+        <span class="muted small">Examples:</span>
+        <span id="examples" class="row"></span>
+      </div>
+    </div>
+    <div id="critpanel" class="panel hidden">
+      <p class="label">Criteria the agent will check (remove any that misread your question)</p>
+      <div id="crits"></div>
+    </div>
+    <div id="results" class="panel hidden">
+      <div class="summary" id="summary"></div>
+      <table>
+        <thead><tr><th></th><th>Study</th><th>Status</th><th>Criteria</th><th class="hide-sm">Cohort</th><th class="hide-sm">Links</th></tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="tab-map" class="hidden">
+    <div class="panel">
+      <div class="row">
+        <span class="label" style="margin:0">Colour by</span>
+        <select id="colorby"></select>
+        <span class="muted small" id="mapnote">Each dot is a study, placed by similarity of its annotated design (embedding of SDRF metadata). Search results are ringed.</span>
+      </div>
+      <div id="mapwrap" style="margin-top:10px"><canvas id="map"></canvas><div id="tip"></div></div>
+      <div class="legend" id="legend"></div>
+    </div>
+  </section>
+
+  <section id="tab-bench" class="hidden">
+    <div class="panel" id="benchpanel"><span class="muted">Loading benchmark…</span></div>
+  </section>
+</main>
+<div class="bar" id="bar"><div class="row">
+  <span id="selcount"></span>
+  <a class="btn" id="dl" href="#">Download manifest (TSV)</a>
+  <a class="btn ghost" id="dljson" href="#">JSON</a>
+  <button class="btn ghost" id="clearsel">Clear</button>
+</div></div>
+
+<script>
+const EXAMPLES = [
+  "Human liver tumour proteomics with paired non-tumour tissue, at least ten patients, accessible raw files. Exclude cell lines.",
+  "human plasma TMT phospho after drug treatment, raw files available",
+  "Alzheimer's disease CSF vs healthy controls, at least 20 patients",
+  "mouse brain knockout vs wild type, DIA",
+  "Orbitrap Astral human plasma, post-translational modifications, last two years, processed peak lists",
+];
+const ICON = {confirmed: "✓", excluded: "✕", unknown: "?"};
+// which Criteria fields to clear when a criterion chip is removed
+const CLEAR = {
+  organism: {organisms: []}, tissue: {tissues: []}, disease: {diseases: []}, cell_type: {cell_types: []},
+  cell_line: {cell_lines: []}, comparison: {comparison: null, paired: false}, paired: {paired: false},
+  min_individuals: {min_individuals: null}, min_samples: {min_samples: null}, no_cell_lines: {exclude_cell_lines: false},
+  only_cell_lines: {only_cell_lines: false}, instrument: {instruments: []}, label: {labels: [], tmt_plex: null},
+  acquisition: {acquisition: []}, ptm: {ptms: []}, raw_files: {raw_files: false}, peak_lists: {peak_lists: false},
+  published_after: {published_after: null}, known_issues: {exclude_flagged: false}, keywords: {keywords: []},
+};
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"}[c]));
+let current = null, selected = new Set(), mapData = null, highlighted = new Set();
+
+async function api(path, opts) {
+  const r = await fetch(path, opts);
+  if (!r.ok) throw new Error((await r.text()) || r.statusText);
+  return r.json();
+}
+
+function init() {
+  for (const ex of EXAMPLES) {
+    const b = document.createElement("button");
+    b.className = "ex"; b.textContent = ex.length > 48 ? ex.slice(0, 46) + "…" : ex; b.title = ex;
+    b.onclick = () => { $("q").value = ex; run(); };
+    $("examples").appendChild(b);
+  }
+  $("go").onclick = run;
+  $("q").addEventListener("keydown", e => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) run(); });
+  document.querySelectorAll("nav button").forEach(b => b.onclick = () => tab(b.dataset.tab));
+  $("clearsel").onclick = () => { selected.clear(); document.querySelectorAll(".sel").forEach(x => x.checked = false); updateBar(); };
+  api("/api/status").then(s => {
+    const commit = (s.meta.sdrf_commit || "").slice(0, 7);
+    $("status").textContent = `${s.projects.toLocaleString()} studies indexed from curated SDRF (bigbio/sdrf-annotated-datasets @ ${commit}) · built ${s.meta.built_at?.slice(0, 10)}`;
+  }).catch(e => $("status").textContent = "index not built: " + e.message);
+  const q = new URLSearchParams(location.search).get("q");
+  if (q) { $("q").value = q; run(); }
+}
+
+function tab(name) {
+  document.querySelectorAll("nav button").forEach(b => b.classList.toggle("on", b.dataset.tab === name));
+  for (const t of ["search", "map", "bench"]) $("tab-" + t).classList.toggle("hidden", t !== name);
+  if (name === "map") loadMap();
+  if (name === "bench") loadBench();
+}
+
+async function run(criteria) {
+  const q = $("q").value.trim();
+  if (!q && !criteria) return;
+  $("busy").classList.remove("hidden"); $("go").disabled = true;
+  try {
+    const res = criteria
+      ? await api("/api/search", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(criteria)})
+      : await api("/api/search?q=" + encodeURIComponent(q));
+    current = res; render(res);
+  } catch (e) {
+    $("results").classList.remove("hidden"); $("tbody").innerHTML = ""; $("summary").textContent = "Error: " + e.message;
+  } finally { $("busy").classList.add("hidden"); $("go").disabled = false; }
+}
+
+function render(res) {
+  $("critpanel").classList.remove("hidden");
+  $("crits").innerHTML = res.criteria_list.map(c =>
+    `<span class="crit ${c.kind}" title="${esc(c.kind)}">${esc(c.label)}<button data-id="${c.id}" title="remove this criterion">×</button></span>`
+  ).join("") || '<span class="muted">No structured criteria recognised; ranking by text relevance only.</span>';
+  $("crits").querySelectorAll("button").forEach(b => b.onclick = () => {
+    const crit = {...current.criteria, ...(CLEAR[b.dataset.id] || {})};
+    run(crit);
+  });
+  const s = res.summary;
+  $("summary").innerHTML = `<b>${s.qualifies}</b> qualify · <b>${s.needs_review}</b> need review · <b>${s.excluded}</b> near misses excluded — ` +
+    `${s.facet_candidates} candidates from ${s.projects_indexed.toLocaleString()} studies, ${s.verified} verified at sample level in ${s.seconds}s`;
+  $("results").classList.remove("hidden");
+  highlighted = new Set(res.results.filter(r => r.status !== "excluded").map(r => r.accession));
+  const tb = $("tbody"); tb.innerHTML = "";
+  for (const r of res.results) {
+    const tr = document.createElement("tr"); tr.className = "res";
+    const pill = r.status === "qualifies" ? "qualifies" : r.status === "excluded" ? "excluded" : "review";
+    const cells = r.checks.map(c => `<span class="cell ${c.status}" title="${esc(c.label)}: ${esc(c.detail)}">${ICON[c.status]}</span>`).join("");
+    const links = Object.entries(r.links).filter(([k]) => k !== "sdrf").map(([k, v]) => `<a href="${esc(v)}" target="_blank" rel="noopener">${k}</a>`).join("") +
+      (r.links.sdrf || []).map(u => `<a href="${esc(u)}" target="_blank" rel="noopener">SDRF</a>`).join("");
+    tr.innerHTML = `<td><input type="checkbox" class="sel" ${selected.has(r.accession) ? "checked" : ""} title="add to manifest"></td>
+      <td><span class="acc">${r.accession}</span>${r.title ? `<div class="small muted">${esc(r.title)}</div>` : ""}</td>
+      <td><span class="pill ${pill}">${r.status}</span></td>
+      <td><div class="cells">${cells}</div></td>
+      <td class="hide-sm design">${esc(r.design)}</td>
+      <td class="hide-sm links">${links}</td>`;
+    const cb = tr.querySelector(".sel");
+    cb.onclick = (e) => { e.stopPropagation(); cb.checked ? selected.add(r.accession) : selected.delete(r.accession); updateBar(); };
+    tr.onclick = () => toggleDetail(tr, r);
+    tb.appendChild(tr);
+  }
+  updateBar();
+}
+
+function toggleDetail(tr, r) {
+  const next = tr.nextElementSibling;
+  if (next && next.classList.contains("detail")) { next.remove(); return; }
+  const d = document.createElement("tr"); d.className = "detail";
+  const checks = r.checks.map(c => `<div class="check"><span class="ic ${c.status}">${ICON[c.status]}</span><b>${esc(c.label)}</b>
+      <span class="det">${esc(c.detail)}${c.hint ? ` <span class="hint">— ${esc(c.hint)}</span>` : ""}${c.source ? ` <span class="src">[${esc(c.source)}]</span>` : ""}</span></div>`).join("");
+  const warn = (r.warnings || []).map(w => `<div class="small muted">⚠ ${esc(w)}</div>`).join("");
+  d.innerHTML = `<td></td><td colspan="5">
+    <div class="small" style="margin-bottom:6px"><b>${esc(r.design)}</b> <span class="muted">· ${r.counts.samples_total} samples in study, ${r.counts.technical_samples} technical/pooled</span></div>
+    ${checks}${warn}
+    <div class="files">
+      <div class="row"><b class="small">Samples &amp; files</b>
+        <input placeholder="filter, e.g. tumour · normal · wild-type controls · patient 3" class="where">
+        <button class="btn ghost small go">Show</button></div>
+      <div class="fl small" style="margin-top:8px"></div>
+    </div></td>`;
+  tr.after(d);
+  const load = async () => {
+    const w = d.querySelector(".where").value;
+    const box = d.querySelector(".fl"); box.innerHTML = '<span class="spinner"></span>';
+    try {
+      const m = await api(`/api/files/${r.accession}` + (w ? `?where=${encodeURIComponent(w)}` : ""));
+      box.innerHTML = `<div style="margin-bottom:6px">${esc(m.answer)}</div>` + m.notes.map(n => `<div class="muted">note: ${esc(n)}</div>`).join("") +
+        `<table><thead><tr><th>Sample</th><th>Individual</th><th>Roles (evidence)</th><th>Data files</th></tr></thead><tbody>` +
+        m.samples.slice(0, 120).map(s => `<tr><td class="mono">${esc(s.sample)}${s.technical ? `<div class="muted">technical: ${esc(s.technical)}</div>` : ""}${s.cell_line ? `<div class="muted">cell line: ${esc(s.cell_line)}</div>` : ""}</td>
+          <td>${esc(s.individual || "–")}</td>
+          <td>${Object.values(s.roles).map(v => `${esc(v.role)} <span class="muted">(${esc(v.evidence)})</span>`).join("<br>") || "–"}</td>
+          <td>${s.files.slice(0, 6).map(f => f.url ? `<a class="mono" href="${esc(f.url)}" target="_blank" rel="noopener">${esc(f.data_file)}</a>` : `<span class="mono">${esc(f.data_file)}</span>`).join("<br>")}${s.files.length > 6 ? `<div class="muted">+${s.files.length - 6} more</div>` : ""}</td></tr>`).join("") +
+        `</tbody></table>` + (m.samples.length > 120 ? `<div class="muted">showing 120 of ${m.samples.length}</div>` : "");
+    } catch (e) { box.textContent = e.message; }
+  };
+  d.querySelector(".go").onclick = load;
+  d.querySelector(".where").addEventListener("keydown", e => { if (e.key === "Enter") load(); });
+}
+
+function updateBar() {
+  $("bar").classList.toggle("on", selected.size > 0);
+  const accs = [...selected].join(",");
+  const q = encodeURIComponent(current?.query || $("q").value);
+  $("selcount").textContent = `${selected.size} ${selected.size === 1 ? "study" : "studies"} selected for the cohort manifest`;
+  $("dl").href = `/api/manifest?acc=${accs}&q=${q}&format=tsv`;
+  $("dljson").href = `/api/manifest?acc=${accs}&q=${q}&format=json`;
+}
+
+// ---------------- study map ----------------
+const PALETTE = ["#2456c8", "#d1495b", "#2e9e6a", "#e0a100", "#7a4fc9", "#13a3b5", "#e36f2b", "#8c8c3e", "#c64ea0", "#4f6d8c"];
+async function loadMap() {
+  if (mapData) { drawMap(); return; }
+  try { mapData = await api("/api/map"); } catch (e) { $("mapnote").textContent = e.message; return; }
+  $("colorby").innerHTML = mapData.facets.map(f => `<option>${f}</option>`).join("");
+  $("colorby").value = "instrument_family";
+  $("colorby").onchange = drawMap;
+  window.addEventListener("resize", drawMap);
+  const cv = $("map");
+  cv.addEventListener("mousemove", e => hover(e));
+  cv.addEventListener("mouseleave", () => $("tip").style.display = "none");
+  cv.addEventListener("click", e => { const p = nearest(e); if (p) { tab("search"); $("q").value = ""; openProject(p.a); } });
+  drawMap();
+}
+let screen = [];
+function drawMap() {
+  const cv = $("map"), dpr = window.devicePixelRatio || 1;
+  const W = cv.clientWidth, H = cv.clientHeight; cv.width = W * dpr; cv.height = H * dpr;
+  const ctx = cv.getContext("2d"); ctx.scale(dpr, dpr); ctx.clearRect(0, 0, W, H);
+  const f = $("colorby").value, counts = {};
+  for (const p of mapData.points) { const v = p[f] || "not annotated"; counts[v] = (counts[v] || 0) + 1; }
+  const top = Object.entries(counts).filter(([v]) => v !== "not annotated").sort((a, b) => b[1] - a[1]).slice(0, 10).map(([v]) => v);
+  const color = v => { const i = top.indexOf(v); return i >= 0 ? PALETTE[i] : getComputedStyle(document.body).getPropertyValue("--line"); };
+  const pad = 14; screen = [];
+  const order = [...mapData.points].sort((a, b) => (top.indexOf(a[f]) < 0) - (top.indexOf(b[f]) < 0)).reverse();
+  for (const p of order) {
+    const x = pad + p.x * (W - 2 * pad), y = pad + (1 - p.y) * (H - 2 * pad);
+    ctx.fillStyle = color(p[f] || "not annotated"); ctx.globalAlpha = .75;
+    ctx.beginPath(); ctx.arc(x, y, 2.2, 0, 7); ctx.fill();
+    screen.push([x, y, p]);
+  }
+  ctx.globalAlpha = 1; ctx.lineWidth = 2; ctx.strokeStyle = getComputedStyle(document.body).getPropertyValue("--ink");
+  for (const [x, y, p] of screen) if (highlighted.has(p.a)) { ctx.beginPath(); ctx.arc(x, y, 6, 0, 7); ctx.stroke(); }
+  $("legend").innerHTML = top.map((v, i) => `<span><i style="background:${PALETTE[i]}"></i>${esc(v)} (${counts[v]})</span>`).join("") +
+    `<span class="muted">other / not annotated: ${mapData.points.length - top.reduce((s, v) => s + counts[v], 0)}</span>`;
+}
+function nearest(e) {
+  const r = $("map").getBoundingClientRect(), mx = e.clientX - r.left, my = e.clientY - r.top;
+  let best = null, bd = 64;
+  for (const [x, y, p] of screen) { const d = (x - mx) ** 2 + (y - my) ** 2; if (d < bd) { bd = d; best = p; } }
+  return best;
+}
+function hover(e) {
+  const p = nearest(e), tip = $("tip");
+  if (!p) { tip.style.display = "none"; return; }
+  const r = $("map").getBoundingClientRect();
+  tip.style.display = "block"; tip.style.left = (e.clientX - r.left + 12) + "px"; tip.style.top = (e.clientY - r.top + 12) + "px";
+  tip.innerHTML = `<b class="acc">${p.a}</b> · ${p.n} samples<br>` + mapData.facets.filter(f => p[f]).map(f => `<span class="muted">${f}:</span> ${esc(p[f])}`).join("<br>") + `<br><span class="muted">click to open</span>`;
+}
+async function openProject(acc) {
+  const res = await api(`/api/search?q=${encodeURIComponent(acc)}&limit=1`).catch(() => null);
+  const p = await api(`/api/project/${acc}`);
+  $("critpanel").classList.add("hidden"); $("results").classList.remove("hidden");
+  $("summary").innerHTML = `Study <span class="acc">${acc}</span> — ${p.counts.samples} samples, ${p.counts.runs} data files` +
+    (p.counts.individuals ? `, ${p.counts.individuals} individuals` : ", individuals not annotated");
+  const design = Object.entries(p.design).map(([k, v]) => `<div class="small"><b>${esc(k)}</b>${v.factor ? " (factor)" : ""}: ${v.levels.slice(0, 8).map(l => `${esc(l.value)} (${l.samples})`).join(", ")}</div>`).join("");
+  $("tbody").innerHTML = `<tr><td></td><td colspan="5">${design || '<span class="muted">no varying attributes</span>'}
+    <div class="links" style="margin-top:6px">${Object.entries(p.links).filter(([k]) => k !== "sdrf").map(([k, v]) => `<a href="${esc(v)}" target="_blank" rel="noopener">${k}</a>`).join("")}</div></td></tr>`;
+  void res;
+}
+
+// ---------------- benchmark ----------------
+async function loadBench() {
+  const box = $("benchpanel");
+  let b;
+  try { b = await api("/api/benchmark"); } catch (e) { box.innerHTML = `<span class="muted">${esc(e.message)}</span>`; return; }
+  const sys = b.systems;
+  const agg = sys.map(s => `<tr><td>${esc(s.label)}</td>${["recall@10", "recall@50", "precision@10", "mrr"].map(m =>
+      `<td style="min-width:120px"><div class="small">${(b.aggregate[s.id][m] * 100).toFixed(0)}%</div><div class="benchbar" style="width:${b.aggregate[s.id][m] * 100}%"></div></td>`).join("")}</tr>`).join("");
+  const rows = b.queries.map(q => `<tr><td class="small">${esc(q.question)}<div class="muted">${q.n_gold} gold studies · ${esc(q.gold_rule)}</div></td>` +
+    sys.map(s => `<td class="small">${(q.scores[s.id]["recall@10"] * 100).toFixed(0)}% / ${(q.scores[s.id]["recall@50"] * 100).toFixed(0)}%</td>`).join("") + `</tr>`).join("");
+  box.innerHTML = `<p class="label">Benchmark · ${b.queries.length} questions · ${esc(b.generated_at)}</p>
+    <p class="small muted">${esc(b.note)}</p>
+    <table><thead><tr><th>System</th><th>Recall@10</th><th>Recall@50</th><th>Precision@10</th><th>MRR</th></tr></thead><tbody>${agg}</tbody></table>
+    <p class="label" style="margin-top:18px">Per question (recall@10 / recall@50)</p>
+    <table><thead><tr><th>Question</th>${sys.map(s => `<th>${esc(s.label)}</th>`).join("")}</tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+init();
+</script>
+</body>
+</html>

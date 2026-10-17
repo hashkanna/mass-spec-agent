@@ -1,0 +1,1726 @@
+{
+ "generated_at": "2026-10-17T12:03:16+00:00",
+ "note": "Gold studies are defined by explicit SQL rules over the raw curated SDRF values (sample_attributes, assays, modifications), written by hand and independently of msagent's vocabulary. They measure whether a natural-language question is turned into the right structured selection, compared with text retrieval over the same per-study metadata. They are not expert relevance judgments, and the questions were written while msagent was being built, so this is not a blind test. Add researcher-reviewed accessions under must_include to strengthen it.",
+ "index": {
+  "sdrf_commit": "2f0c42d055052a83274dcfa7ec417ae7da300f10 2026-10-17T11:25:29+01:00",
+  "embedder": "wordllama/l2_supercat_256"
+ },
+ "systems": [
+  {
+   "id": "bm25",
+   "label": "Keyword (BM25)"
+  },
+  {
+   "id": "semantic",
+   "label": "Semantic (embeddings)"
+  },
+  {
+   "id": "hybrid",
+   "label": "Hybrid keyword+semantic"
+  },
+  {
+   "id": "msagent",
+   "label": "Mass-Spec Agent"
+  }
+ ],
+ "aggregate": {
+  "bm25": {
+   "recall@10": 0.4263,
+   "recall@50": 0.5989,
+   "precision@10": 0.3158,
+   "mrr": 0.5321
+  },
+  "semantic": {
+   "recall@10": 0.1237,
+   "recall@50": 0.178,
+   "precision@10": 0.1053,
+   "mrr": 0.2636
+  },
+  "hybrid": {
+   "recall@10": 0.3237,
+   "recall@50": 0.4754,
+   "precision@10": 0.2684,
+   "mrr": 0.5084
+  },
+  "msagent": {
+   "recall@10": 0.9684,
+   "recall@50": 0.9285,
+   "precision@10": 0.7316,
+   "mrr": 1.0
+  }
+ },
+ "queries": [
+  {
+   "id": "liver_tumour_paired",
+   "question": "Human liver tumour proteomics with paired non-tumour tissue, at least ten patients, accessible raw files. Exclude cell lines.",
+   "gold_rule": "human liver samples; >=10 annotated individuals each having a tumour and a normal/non-tumour sample",
+   "n_gold": 3,
+   "scores": {
+    "bm25": {
+     "recall@10": 0.0,
+     "recall@50": 0.0,
+     "precision@10": 0.0,
+     "mrr": 0.0
+    },
+    "semantic": {
+     "recall@10": 0.0,
+     "recall@50": 0.0,
+     "precision@10": 0.0,
+     "mrr": 0.0
+    },
+    "hybrid": {
+     "recall@10": 0.0,
+     "recall@50": 0.0,
+     "precision@10": 0.0,
+     "mrr": 0.0
+    },
+    "msagent": {
+     "recall@10": 1.0,
+     "recall@50": 1.0,
+     "precision@10": 0.3,
+     "mrr": 1.0
+    }
+   },
+   "top": {
+    "bm25": [
+     "PXD069159",
+     "PXD011444",
+     "PXD032266",
+     "PXD033232",
+     "PXD027341",
+     "PXD016709",
+     "PXD011924",
+     "PXD037021",
+     "PXD031694",
+     "PXD011799"
+    ],
+    "semantic": [
+     "PXD014033",
+     "PXD019263",
+     "PXD078075",
+     "PXD048294",
+     "PXD000534",
+     "PXD068384",
+     "PXD003808",
+     "PXD051668",
+     "PXD082954",
+     "PXD081136"
+    ],
+    "hybrid": [
+     "PXD000534",
+     "PXD014033",
+     "PXD069159",
+     "PXD011444",
+     "PXD019263",
+     "PXD032266",
+     "PXD078075",
+     "PXD033232",
+     "PXD048294",
+     "PXD027341"
+    ],
+    "msagent": [
+     "PXD002171",
+     "PXD013057",
+     "PXD005571",
+     "PXD037021",
+     "PXD014556",
+     "PXD016709",
+     "PXD074470",
+     "PXD039654",
+     "PXD066255",
+     "PXD025522"
+    ]
+   },
+   "seconds": {
+    "bm25": 0.01,
+    "semantic": 0.36,
+    "hybrid": 0.0,
+    "msagent": 2.37
+   }
+  },
+  {
+   "id": "plasma_tmt",
+   "question": "Human plasma proteomics quantified with TMT",
+   "gold_rule": "human; organism part contains 'plasma' (not seminal); TMT channel labels",
+   "n_gold": 4,
+   "scores": {
+    "bm25": {
+     "recall@10": 0.5,
+     "recall@50": 1.0,
+     "precision@10": 0.2,
+     "mrr": 1.0
+    },
+    "semantic": {
+     "recall@10": 0.25,
+     "recall@50": 0.25,
+     "precision@10": 0.1,
+     "mrr": 1.0
+    },
+    "hybrid": {
+     "recall@10": 0.25,
+     "recall@50": 0.5,
+     "precision@10": 0.1,
+     "mrr": 1.0
+    },
+    "msagent": {
+     "recall@10": 1.0,
+     "recall@50": 1.0,
+     "precision@10": 0.4,
+     "mrr": 1.0
+    }
+   },
+   "top": {
+    "bm25": [
+     "PXD080484",
+     "PXD072863",
+     "PXD061705",
+     "PXD074792",
+     "PXD066255",
+     "PXD037393",
+     "PXD073010",
+     "PXD061144",
+     "PXD062275",
+     "PXD064475"
+    ],
+    "semantic": [
+     "PXD080484",
+     "PXD069282",
+     "PXD051478",
+     "PXD001601",
+     "PXD000001",
+     "PXD030751",
+     "PXD008378",
+     "PXD024444",
+     "PXD043636",
+     "PXD016605"
+    ],
+    "hybrid": [
+     "PXD080484",
+     "PXD061705",
+     "PXD038152",
+     "PXD043636",
+     "PXD014242",
+     "PXD033582",
+     "PXD054402",
+     "PXD052912",
+     "PXD011079",
+     "PXD055083"
+    ],
+    "msagent": [
+     "PXD080484",
+     "PXD061144",
+     "PXD057292",
+     "PXD017201",
+     "PXD015087",
+     "PXD014502",
+     "PXD013277",
+     "PXD020815",
+     "PXD027341",
+     "PXD022323"
+    ]
+   },
+   "seconds": {
+    "bm25": 0.0,
+    "semantic": 0.0,
+    "hybrid": 0.0,
+    "msagent": 1.6
+   }
+  },
+  {
+   "id": "csf_alzheimer_controls",
+   "question": "Alzheimer's disease cerebrospinal fluid proteomics comparing patients with healthy controls",
+   "gold_rule": "CSF samples; an Alzheimer's annotation; a normal/healthy/control annotation",
+   "n_gold": 1,
+   "scores": {
+    "bm25": {
+     "recall@10": 1.0,
+     "recall@50": 1.0,
+     "precision@10": 0.1,
+     "mrr": 0.125
+    },
+    "semantic": {
+     "recall@10": 0.0,
+     "recall@50": 0.0,
+     "precision@10": 0.0,
+     "mrr": 0.0
+    },
+    "hybrid": {
+     "recall@10": 0.0,
+     "recall@50": 1.0,
+     "precision@10": 0.0,
+     "mrr": 0.0556
+    },
+    "msagent": {
+     "recall@10": 1.0,
+     "recall@50": 1.0,
+     "precision@10": 0.1,
+     "mrr": 1.0
+    }
+   },
+   "top": {
+    "bm25": [
+     "PXD009623",
+     "PXD007555",
+     "PXD034935",
+     "PXD053568",
+     "PXD008076",
+     "JPST000958",
+     "PXD010705",
+     "PXD016278",
+     "PXD045058",
+     "PXD015619"
+    ],
+    "semantic": [
+     "PXD007160",
+     "PXD012131",
+     "PXD037133",
+     "JPST000958",
+     "PXD025663",
+     "PXD075314",
+     "PXD009199",
+     "PXD000878",
+     "PXD012981",
+     "PXD031417"
+    ],
+    "hybrid": [
+     "JPST000958",
+     "PXD008076",
+     "PXD007160",
+     "PXD000651",
+     "PXD000652",
+     "PXD020494",
+     "PXD000764",
+     "PXD009623",
+     "PXD007555",
+     "PXD012131"
+    ],
+    "msagent": [
+     "PXD016278",
+     "PXD000651",
+     "PXD045058",
+     "PXD000652",
+     "PXD020494",
+     "PXD009623",
+     "PXD010705",
+     "PXD010698",
+     "PXD010708",
+     "PXD015619"
+    ]
+   },
+   "seconds": {
+    "bm25": 0.0,
+    "semantic": 0.0,
+    "hybrid": 0.0,
+    "msagent": 1.85
+   }
+  },
+  {
+   "id": "astral_plasma",
+   "question": "Orbitrap Astral datasets of human blood plasma",
+   "gold_rule": "Astral runs; human; organism part contains 'plasma'",
+   "n_gold": 11,
+   "scores": {
+    "bm25": {
+     "recall@10": 0.7,
+     "recall@50": 0.9091,
+     "precision@10": 0.7,
+     "mrr": 1.0
+    },
+    "semantic": {
+     "recall@10": 0.3,
+     "recall@50": 0.2727,
+     "precision@10": 0.3,
+     "mrr": 0.2
+    },
+    "hybrid": {
+     "recall@10": 0.3,
+     "recall@50": 0.9091,
+     "precision@10": 0.3,
+     "mrr": 1.0
+    },
+    "msagent": {
+     "recall@10": 0.8,
+     "recall@50": 0.7273,
+     "precision@10": 0.8,
+     "mrr": 1.0
+    }
+   },
+   "top": {
+    "bm25": [
+     "PXD062275",
+     "PXD062274",
+     "PXD062313",
+     "PXD080484",
+     "PXD064487",
+     "PXD064475",
+     "PXD069060",
+     "PXD068107",
+     "PXD053387",
+     "PXD066255"
+    ],
+    "semantic": [
+     "PXD031919",
+     "PXD033582",
+     "PXD004242",
+     "PXD076368",
+     "PXD062274",
+     "PXD062275",
+     "PXD074792",
+     "PXD023471",
+     "PXD075093",
+     "PXD055594"
+    ],
+    "hybrid": [
+     "PXD062275",
+     "PXD062274",
+     "PXD033582",
+     "PXD080484",
+     "PXD004242",
+     "PXD075093",
+     "PXD074792",
+     "PXD066255",
+     "PXD031919",
+     "PXD002854"
+    ],
+    "msagent": [
+     "PXD062274",
+     "PXD075093",
+     "PXD062313",
+     "PXD069060",
+     "PXD068107",
+     "IPX0010296000",
+     "PXD072114",
+     "PXD067119",
+     "PXD055741",
+     "ProteoBench-Astral-Module7"
+    ]
+   },
+   "seconds": {
+    "bm25": 0.0,
+    "semantic": 0.0,
+    "hybrid": 0.0,
+    "msagent": 1.13
+   }
+  },
+  {
+   "id": "timstof_dia_mouse_brain",
+   "question": "DIA timsTOF data from mouse brain",
+   "gold_rule": "timsTOF + data-independent runs; mouse; brain region",
+   "n_gold": 5,
+   "scores": {
+    "bm25": {
+     "recall@10": 0.0,
+     "recall@50": 0.6,
+     "precision@10": 0.0,
+     "mrr": 0.0345
+    },
+    "semantic": {
+     "recall@10": 0.0,
+     "recall@50": 0.0,
+     "precision@10": 0.0,
+     "mrr": 0.0
+    },
+    "hybrid": {
+     "recall@10": 0.0,
+     "recall@50": 0.2,
+     "precision@10": 0.0,
+     "mrr": 0.0204
+    },
+    "msagent": {
+     "recall@10": 1.0,
+     "recall@50": 1.0,
+     "precision@10": 0.5,
+     "mrr": 1.0
+    }
+   },
+   "top": {
+    "bm25": [
+     "PXD054360",
+     "PXD022689",
+     "PXD025316",
+     "PXD053427",
+     "PXD017170",
+     "PXD079300",
+     "PXD060129",
+     "PXD075093",
+     "PXD053042",
+     "PXD065749"
+    ],
+    "semantic": [
+     "PXD012056",
+     "PXD029195",
+     "PXD053427",
+     "PXD038181",
+     "PXD016530",
+     "PXD063243",
+     "PXD071717",
+     "PXD003152",
+     "PXD029546",
+     "PXD048277"
+    ],
+    "hybrid": [
+     "PXD053427",
+     "PXD025316",
+     "PXD017170",
+     "PXD060057",
+     "PXD025493",
+     "PXD000271",
+     "PXD038895",
+     "PXD025688",
+     "PXD037090",
+     "PXD063974"
+    ],
+    "msagent": [
+     "PXD040358",
+     "PXD051943",
+     "PXD052118",
+     "PXD072193",
+     "PXD055552",
+     "PXD038368",
+     "PXD053042",
+     "PXD053015",
+     "PXD074595",
+     "PXD042265"
+    ]
+   },
+   "seconds": {
+    "bm25": 0.0,
+    "semantic": 0.0,
+    "hybrid": 0.0,
+    "msagent": 1.5
+   }
+  },
+  {
+   "id": "tmt_phospho_cancer",
+   "question": "TMT phosphoproteomics with phosphopeptide enrichment in human cancer cells",
+   "gold_rule": "TMT; phospho enrichment annotated; human; cancer disease annotation",
+   "n_gold": 5,
+   "scores": {
+    "bm25": {
+     "recall@10": 0.2,
+     "recall@50": 0.8,
+     "precision@10": 0.1,
+     "mrr": 0.3333
+    },
+    "semantic": {
+     "recall@10": 0.2,
+     "recall@50": 0.6,
+     "precision@10": 0.1,
+     "mrr": 0.125
+    },
+    "hybrid": {
+     "recall@10": 0.6,
+     "recall@50": 0.8,
+     "precision@10": 0.3,
+     "mrr": 0.25
+    },
+    "msagent": {
+     "recall@10": 1.0,
+     "recall@50": 1.0,
+     "precision@10": 0.5,
+     "mrr": 1.0
+    }
+   },
+   "top": {
+    "bm25": [
+     "PXD001558",
+     "PXD062535",
+     "PXD011799",
+     "PXD029180",
+     "PXD029730",
+     "PXD040964",
+     "PXD009908",
+     "PXD043214",
+     "PXD075314",
+     "PXD033120"
+    ],
+    "semantic": [
+     "PXD000836",
+     "PXD018871",
+     "PXD062535",
+     "PXD046857",
+     "PXD002927",
+     "PXD075314",
+     "PXD002545",
+     "PXD036078",
+     "PXD018241",
+     "PXD029180"
+    ],
+    "hybrid": [
+     "PXD062535",
+     "PXD029180",
+     "PXD075314",
+     "PXD006430",
+     "PXD036078",
+     "PXD001558",
+     "PXD000836",
+     "PXD018871",
+     "PXD011799",
+     "PXD046857"
+    ],
+    "msagent": [
+     "PXD006430",
+     "PXD036078",
+     "PXD018581",
+     "PXD041824",
+     "PXD011799",
+     "PXD048529",
+     "PXD050453",
+     "PXD030450",
+     "PXD026086",
+     "PXD002871"
+    ]
+   },
+   "seconds": {
+    "bm25": 0.0,
+    "semantic": 0.0,
+    "hybrid": 0.0,
+    "msagent": 1.13
+   }
+  },
+  {
+   "id": "ubiquitinome",
+   "question": "Ubiquitinome profiling with diGly remnant enrichment",
+   "gold_rule": "GlyGly (UNIMOD:121) searched or ubiquitin enrichment annotated",
+   "n_gold": 47,
+   "scores": {
+    "bm25": {
+     "recall@10": 0.4,
+     "recall@50": 0.0851,
+     "precision@10": 0.4,
+     "mrr": 1.0
+    },
+    "semantic": {
+     "recall@10": 0.0,
+     "recall@50": 0.0638,
+     "precision@10": 0.0,
+     "mrr": 0.0714
+    },
+    "hybrid": {
+     "recall@10": 0.4,
+     "recall@50": 0.1064,
+     "precision@10": 0.4,
+     "mrr": 0.3333
+    },
+    "msagent": {
+     "recall@10": 1.0,
+     "recall@50": 1.0,
+     "precision@10": 1.0,
+     "mrr": 1.0
+    }
+   },
+   "top": {
+    "bm25": [
+     "PXD009199",
+     "PXD069159",
+     "PXD054890",
+     "PXD002255",
+     "PXD029730",
+     "PXD043214",
+     "PXD062535",
+     "PXD029180",
+     "PXD003339",
+     "PXD014864"
+    ],
+    "semantic": [
+     "PXD015482",
+     "PXD058868",
+     "PXD026606",
+     "PXD000292",
+     "PXD067302",
+     "PXD002055",
+     "PXD000959",
+     "PXD000985",
+     "PXD039633",
+     "PXD029439"
+    ],
+    "hybrid": [
+     "PXD015482",
+     "PXD029730",
+     "PXD002255",
+     "PXD000178",
+     "PXD076788",
+     "PXD009199",
+     "PXD069159",
+     "PXD058868",
+     "PXD054890",
+     "PXD026606"
+    ],
+    "msagent": [
+     "PXD002255",
+     "PXD009199",
+     "PXD037732",
+     "PXD054890",
+     "PXD044126",
+     "PXD067225",
+     "PXD027163",
+     "PXD069159",
+     "PXD012734",
+     "PXD041047"
+    ]
+   },
+   "seconds": {
+    "bm25": 0.0,
+    "semantic": 0.0,
+    "hybrid": 0.0,
+    "msagent": 0.37
+   }
+  },
+  {
+   "id": "silac_hela",
+   "question": "SILAC proteomics in HeLa cells",
+   "gold_rule": "SILAC labels; HeLa named in any sample attribute",
+   "n_gold": 22,
+   "scores": {
+    "bm25": {
+     "recall@10": 0.4,
+     "recall@50": 0.6364,
+     "precision@10": 0.4,
+     "mrr": 1.0
+    },
+    "semantic": {
+     "recall@10": 0.1,
+     "recall@50": 0.3182,
+     "precision@10": 0.1,
+     "mrr": 0.2
+    },
+    "hybrid": {
+     "recall@10": 0.5,
+     "recall@50": 0.4545,
+     "precision@10": 0.5,
+     "mrr": 0.5
+    },
+    "msagent": {
+     "recall@10": 1.0,
+     "recall@50": 1.0,
+     "precision@10": 1.0,
+     "mrr": 1.0
+    }
+   },
+   "top": {
+    "bm25": [
+     "PXD027163",
+     "PXD001856",
+     "PXD012559",
+     "PXD055162",
+     "PXD005072",
+     "PXD061449",
+     "PXD023124",
+     "PXD051121",
+     "PXD004995",
+     "PXD043214"
+    ],
+    "semantic": [
+     "PXD024043",
+     "PXD000849",
+     "PXD000776",
+     "PXD003558",
+     "PXD051121",
+     "PXD021882",
+     "PXD074652",
+     "PXD063560",
+     "PXD001856",
+     "PXD022622"
+    ],
+    "hybrid": [
+     "PXD001856",
+     "PXD051121",
+     "PXD027163",
+     "PXD004995",
+     "PXD000849",
+     "PXD012559",
+     "PXD061449",
+     "PXD046357",
+     "PXD024320",
+     "PXD052192"
+    ],
+    "msagent": [
+     "PXD051121",
+     "PXD027163",
+     "PXD004995",
+     "PXD061449",
+     "PXD024320",
+     "PXD039580",
+     "PXD026720",
+     "PXD002829",
+     "PXD018122",
+     "PXD002001"
+    ]
+   },
+   "seconds": {
+    "bm25": 0.0,
+    "semantic": 0.0,
+    "hybrid": 0.0,
+    "msagent": 0.88
+   }
+  },
+  {
+   "id": "covid_serum_plasma",
+   "question": "COVID-19 patient serum or plasma proteomics",
+   "gold_rule": "COVID-19/SARS-CoV-2 annotation; serum or plasma samples",
+   "n_gold": 18,
+   "scores": {
+    "bm25": {
+     "recall@10": 0.4,
+     "recall@50": 0.9444,
+     "precision@10": 0.4,
+     "mrr": 0.25
+    },
+    "semantic": {
+     "recall@10": 0.1,
+     "recall@50": 0.1111,
+     "precision@10": 0.1,
+     "mrr": 0.125
+    },
+    "hybrid": {
+     "recall@10": 0.2,
+     "recall@50": 0.8333,
+     "precision@10": 0.2,
+     "mrr": 0.3333
+    },
+    "msagent": {
+     "recall@10": 1.0,
+     "recall@50": 1.0,
+     "precision@10": 1.0,
+     "mrr": 1.0
+    }
+   },
+   "top": {
+    "bm25": [
+     "PXD057292",
+     "PXD070868",
+     "PXD002145",
+     "PXD051341",
+     "PXD007231",
+     "PXD021581",
+     "MSV000078555",
+     "PXD029567",
+     "PXD048093",
+     "PXD046829"
+    ],
+    "semantic": [
+     "PXD031919",
+     "PXD033582",
+     "PXD013234",
+     "PXD004242",
+     "PXD055594",
+     "PXD074792",
+     "PXD076368",
+     "PXD073010",
+     "PXD016727",
+     "PXD022361"
+    ],
+    "hybrid": [
+     "PXD057292",
+     "PXD070868",
+     "PXD073010",
+     "PXD016727",
+     "PXD041831",
+     "PXD002854",
+     "PXD031919",
+     "PXD033582",
+     "PXD002145",
+     "PXD013234"
+    ],
+    "msagent": [
+     "PXD073010",
+     "PXD041831",
+     "PXD051341",
+     "PXD021581",
+     "PXD072757",
+     "PXD029567",
+     "PXD046829",
+     "PXD026091",
+     "PXD023521",
+     "PXD054443"
+    ]
+   },
+   "seconds": {
+    "bm25": 0.0,
+    "semantic": 0.0,
+    "hybrid": 0.0,
+    "msagent": 1.41
+   }
+  },
+  {
+   "id": "mouse_liver_knockout",
+   "question": "Liver proteomics of knockout mice versus wild-type",
+   "gold_rule": "mouse; liver; genotype includes wild type and at least one other genotype",
+   "n_gold": 14,
+   "scores": {
+    "bm25": {
+     "recall@10": 0.3,
+     "recall@50": 0.5714,
+     "precision@10": 0.3,
+     "mrr": 0.1667
+    },
+    "semantic": {
+     "recall@10": 0.1,
+     "recall@50": 0.2143,
+     "precision@10": 0.1,
+     "mrr": 0.5
+    },
+    "hybrid": {
+     "recall@10": 0.3,
+     "recall@50": 0.5,
+     "precision@10": 0.3,
+     "mrr": 1.0
+    },
+    "msagent": {
+     "recall@10": 1.0,
+     "recall@50": 1.0,
+     "precision@10": 1.0,
+     "mrr": 1.0
+    }
+   },
+   "top": {
+    "bm25": [
+     "PXD064675",
+     "PXD081654",
+     "PXD069221",
+     "PXD011473",
+     "PXD018316",
+     "PXD045279",
+     "PXD003427",
+     "PXD054672",
+     "PXD046809",
+     "PXD017170"
+    ],
+    "semantic": [
+     "PXD009021",
+     "PXD017170",
+     "PXD048294",
+     "PXD022622",
+     "PXD051668",
+     "PXD026814",
+     "PXD055173",
+     "PXD011473",
+     "PXD006077",
+     "PXD039759"
+    ],
+    "hybrid": [
+     "PXD017170",
+     "PXD011473",
+     "PXD081654",
+     "PXD069221",
+     "PXD046809",
+     "PXD045279",
+     "PXD028966",
+     "PXD038895",
+     "PXD006647",
+     "PXD064675"
+    ],
+    "msagent": [
+     "PXD017170",
+     "PXD046809",
+     "PXD045279",
+     "PXD066413",
+     "PXD003155",
+     "PXD029217",
+     "PXD078397",
+     "PXD046506",
+     "PXD048652",
+     "PXD042249"
+    ]
+   },
+   "seconds": {
+    "bm25": 0.0,
+    "semantic": 0.0,
+    "hybrid": 0.0,
+    "msagent": 1.08
+   }
+  },
+  {
+   "id": "urine_large",
+   "question": "Human urine proteomics with at least 50 samples",
+   "gold_rule": "human; urine; >= 50 samples in the study",
+   "n_gold": 18,
+   "scores": {
+    "bm25": {
+     "recall@10": 0.0,
+     "recall@50": 0.0,
+     "precision@10": 0.0,
+     "mrr": 0.0
+    },
+    "semantic": {
+     "recall@10": 0.0,
+     "recall@50": 0.0556,
+     "precision@10": 0.0,
+     "mrr": 0.0263
+    },
+    "hybrid": {
+     "recall@10": 0.0,
+     "recall@50": 0.0,
+     "precision@10": 0.0,
+     "mrr": 0.0
+    },
+    "msagent": {
+     "recall@10": 1.0,
+     "recall@50": 0.7778,
+     "precision@10": 1.0,
+     "mrr": 1.0
+    }
+   },
+   "top": {
+    "bm25": [
+     "PXD034223",
+     "PXD071678",
+     "PXD067654",
+     "PXD069837",
+     "PXD057308",
+     "PXD075344",
+     "PXD062535",
+     "PXD046327",
+     "PXD050597",
+     "PXD007842"
+    ],
+    "semantic": [
+     "PXD005780",
+     "PXD001224",
+     "PXD061467",
+     "PXD056255",
+     "PXD053491",
+     "PXD006482",
+     "PXD018594",
+     "PXD026407",
+     "PXD001061",
+     "PXD026824"
+    ],
+    "hybrid": [
+     "PXD034223",
+     "PXD005780",
+     "PXD071678",
+     "PXD001224",
+     "PXD067654",
+     "PXD061467",
+     "PXD069837",
+     "PXD056255",
+     "PXD057308",
+     "PXD053491"
+    ],
+    "msagent": [
+     "PXD012414",
+     "PXD051553",
+     "PXD071111",
+     "PXD037505",
+     "PXD032394",
+     "PXD038860",
+     "PXD005232",
+     "PXD005143",
+     "PXD025925",
+     "PXD013111"
+    ]
+   },
+   "seconds": {
+    "bm25": 0.0,
+    "semantic": 0.0,
+    "hybrid": 0.0,
+    "msagent": 0.71
+   }
+  },
+  {
+   "id": "drug_vs_dmso_tmt_cell_lines",
+   "question": "TMT proteomics of cell lines treated with a drug compared with DMSO vehicle control",
+   "gold_rule": "TMT; cell-line annotation; treatment/compound has a control level and a non-control level",
+   "n_gold": 21,
+   "scores": {
+    "bm25": {
+     "recall@10": 0.4,
+     "recall@50": 0.381,
+     "precision@10": 0.4,
+     "mrr": 1.0
+    },
+    "semantic": {
+     "recall@10": 0.0,
+     "recall@50": 0.0952,
+     "precision@10": 0.0,
+     "mrr": 0.0833
+    },
+    "hybrid": {
+     "recall@10": 0.2,
+     "recall@50": 0.2381,
+     "precision@10": 0.2,
+     "mrr": 1.0
+    },
+    "msagent": {
+     "recall@10": 0.6,
+     "recall@50": 0.8571,
+     "precision@10": 0.6,
+     "mrr": 1.0
+    }
+   },
+   "top": {
+    "bm25": [
+     "PXD037999",
+     "PXD026481",
+     "PXD046853",
+     "PXD007762",
+     "PXD066812",
+     "PXD057551",
+     "PXD043814",
+     "PXD072863",
+     "PXD060641",
+     "PXD070785"
+    ],
+    "semantic": [
+     "PXD051478",
+     "PXD069282",
+     "PXD014369",
+     "PXD016940",
+     "PXD030650",
+     "PXD018122",
+     "PXD013066",
+     "PXD021982",
+     "PXD033550",
+     "PXD056327"
+    ],
+    "hybrid": [
+     "PXD026481",
+     "PXD037999",
+     "PXD033550",
+     "PXD038318",
+     "PXD009157",
+     "PXD051478",
+     "PXD069282",
+     "PXD046853",
+     "PXD014369",
+     "PXD007762"
+    ],
+    "msagent": [
+     "PXD026481",
+     "PXD037999",
+     "PXD066812",
+     "PXD014145",
+     "PXD065743",
+     "PXD060641",
+     "PXD023218",
+     "PXD060120",
+     "PXD021792",
+     "PXD006291"
+    ]
+   },
+   "seconds": {
+    "bm25": 0.0,
+    "semantic": 0.0,
+    "hybrid": 0.0,
+    "msagent": 1.21
+   }
+  },
+  {
+   "id": "arabidopsis_dia",
+   "question": "Arabidopsis proteome measured with data-independent acquisition",
+   "gold_rule": "Arabidopsis; data-independent runs",
+   "n_gold": 33,
+   "scores": {
+    "bm25": {
+     "recall@10": 0.1,
+     "recall@50": 0.0909,
+     "precision@10": 0.1,
+     "mrr": 1.0
+    },
+    "semantic": {
+     "recall@10": 0.0,
+     "recall@50": 0.1212,
+     "precision@10": 0.0,
+     "mrr": 0.0769
+    },
+    "hybrid": {
+     "recall@10": 0.1,
+     "recall@50": 0.0909,
+     "precision@10": 0.1,
+     "mrr": 0.3333
+    },
+    "msagent": {
+     "recall@10": 1.0,
+     "recall@50": 1.0,
+     "precision@10": 1.0,
+     "mrr": 1.0
+    }
+   },
+   "top": {
+    "bm25": [
+     "PXD060129",
+     "PXD054360",
+     "PXD029997",
+     "PXD053485",
+     "PXD016519",
+     "PXD003698",
+     "PXD017812",
+     "PXD051303",
+     "PXD046281",
+     "PXD054890"
+    ],
+    "semantic": [
+     "PXD000878",
+     "PXD046281",
+     "PXD038116",
+     "PXD006077",
+     "PXD069402",
+     "PXD016519",
+     "PXD049287",
+     "PXD001061",
+     "PXD038126",
+     "PXD067368"
+    ],
+    "hybrid": [
+     "PXD046281",
+     "PXD016519",
+     "PXD060129",
+     "PXD006077",
+     "PXD029997",
+     "PXD049287",
+     "PXD030112",
+     "PXD041996",
+     "PXD058046",
+     "PXD041898"
+    ],
+    "msagent": [
+     "PXD060129",
+     "PXD035252",
+     "PXD076316",
+     "PXD076680",
+     "PXD075951",
+     "PXD044681",
+     "PXD047608",
+     "PXD035892",
+     "PXD069625",
+     "PXD047594"
+    ]
+   },
+   "seconds": {
+    "bm25": 0.0,
+    "semantic": 0.0,
+    "hybrid": 0.0,
+    "msagent": 0.4
+   }
+  },
+  {
+   "id": "glycoproteomics",
+   "question": "Glycoproteomics with glycopeptide enrichment",
+   "gold_rule": "glyco/lectin/HILIC enrichment annotated, or a glycan modification searched",
+   "n_gold": 22,
+   "scores": {
+    "bm25": {
+     "recall@10": 0.0,
+     "recall@50": 0.0,
+     "precision@10": 0.0,
+     "mrr": 0.0
+    },
+    "semantic": {
+     "recall@10": 0.0,
+     "recall@50": 0.0,
+     "precision@10": 0.0,
+     "mrr": 0.0
+    },
+    "hybrid": {
+     "recall@10": 0.0,
+     "recall@50": 0.0,
+     "precision@10": 0.0,
+     "mrr": 0.0
+    },
+    "msagent": {
+     "recall@10": 1.0,
+     "recall@50": 1.0,
+     "precision@10": 1.0,
+     "mrr": 1.0
+    }
+   },
+   "top": {
+    "bm25": [
+     "PXD002255",
+     "PXD029730",
+     "PXD043214",
+     "PXD062535",
+     "PXD029180",
+     "PXD003339",
+     "PXD014864",
+     "PXD002441",
+     "PXD000178",
+     "PXD015482"
+    ],
+    "semantic": [
+     "PXD031975",
+     "PXD016318",
+     "PXD027249",
+     "PXD065166",
+     "PXD042701",
+     "PXD000292",
+     "PXD027909",
+     "PXD000972",
+     "PXD001425",
+     "PXD018871"
+    ],
+    "hybrid": [
+     "PXD002255",
+     "PXD076788",
+     "PMID21183079",
+     "PXD031975",
+     "PXD029730",
+     "PXD016318",
+     "PXD043214",
+     "PXD027249",
+     "PXD062535",
+     "PXD065166"
+    ],
+    "msagent": [
+     "PXD081082",
+     "PXD018771",
+     "PXD003469",
+     "PXD000332",
+     "PXD003397",
+     "PXD036078",
+     "PXD083651",
+     "PXD023099",
+     "PXD052706",
+     "PXD013482"
+    ]
+   },
+   "seconds": {
+    "bm25": 0.0,
+    "semantic": 0.0,
+    "hybrid": 0.0,
+    "msagent": 0.36
+   }
+  },
+  {
+   "id": "heart_failure_vs_donor",
+   "question": "Human heart tissue proteomics in heart failure or cardiomyopathy versus non-failing donor hearts",
+   "gold_rule": "human; heart tissue; heart failure/cardiomyopathy annotation; a normal/control/non-failing/donor annotation",
+   "n_gold": 5,
+   "scores": {
+    "bm25": {
+     "recall@10": 0.8,
+     "recall@50": 1.0,
+     "precision@10": 0.4,
+     "mrr": 1.0
+    },
+    "semantic": {
+     "recall@10": 0.2,
+     "recall@50": 0.2,
+     "precision@10": 0.1,
+     "mrr": 0.5
+    },
+    "hybrid": {
+     "recall@10": 0.4,
+     "recall@50": 0.8,
+     "precision@10": 0.2,
+     "mrr": 1.0
+    },
+    "msagent": {
+     "recall@10": 1.0,
+     "recall@50": 1.0,
+     "precision@10": 0.5,
+     "mrr": 1.0
+    }
+   },
+   "top": {
+    "bm25": [
+     "PXD060431",
+     "PXD035622",
+     "PXD052878",
+     "PXD035712",
+     "PXD045677",
+     "PXD027766",
+     "PXD008934",
+     "PXD028529",
+     "PXD064470",
+     "PXD050610"
+    ],
+    "semantic": [
+     "PXD012636",
+     "PXD008934",
+     "PXD048093",
+     "PXD060109",
+     "PXD012593",
+     "PXD018678",
+     "PXD006675",
+     "PXD061609",
+     "PXD003204",
+     "PXD039144"
+    ],
+    "hybrid": [
+     "PXD008934",
+     "PXD018678",
+     "PXD039144",
+     "PXD004631",
+     "PXD006675",
+     "PXD074354",
+     "PXD064057",
+     "PXD044695",
+     "PXD038066",
+     "PXD060431"
+    ],
+    "msagent": [
+     "PXD008934",
+     "PXD052878",
+     "PXD038544",
+     "PXD060431",
+     "PXD045677",
+     "PXD028908",
+     "PXD082534",
+     "PXD053721",
+     "PXD054266",
+     "PXD011349"
+    ]
+   },
+   "seconds": {
+    "bm25": 0.0,
+    "semantic": 0.0,
+    "hybrid": 0.0,
+    "msagent": 0.76
+   }
+  },
+  {
+   "id": "single_cell",
+   "question": "Single-cell proteomics datasets",
+   "gold_rule": "SDRF single-cell template, or sample type 'single cell'",
+   "n_gold": 77,
+   "scores": {
+    "bm25": {
+     "recall@10": 0.9,
+     "recall@50": 0.94,
+     "precision@10": 0.9,
+     "mrr": 1.0
+    },
+    "semantic": {
+     "recall@10": 0.5,
+     "recall@50": 0.22,
+     "precision@10": 0.5,
+     "mrr": 1.0
+    },
+    "hybrid": {
+     "recall@10": 1.0,
+     "recall@50": 0.62,
+     "precision@10": 1.0,
+     "mrr": 1.0
+    },
+    "msagent": {
+     "recall@10": 1.0,
+     "recall@50": 0.56,
+     "precision@10": 1.0,
+     "mrr": 1.0
+    }
+   },
+   "top": {
+    "bm25": [
+     "PXD045844",
+     "PXD016921",
+     "PXD077117",
+     "PXD048162",
+     "PXD069898",
+     "PXD019958",
+     "PXD028991",
+     "PXD019515",
+     "PXD024412",
+     "PXD048179"
+    ],
+    "semantic": [
+     "PXD016921",
+     "PXD011081",
+     "PXD051668",
+     "PXD053023",
+     "PXD019958",
+     "PXD074900",
+     "PXD027135",
+     "PXD027351",
+     "PXD016517",
+     "PXD067737"
+    ],
+    "hybrid": [
+     "PXD016921",
+     "PXD019958",
+     "PXD027135",
+     "PXD053023",
+     "PXD074900",
+     "PXD043473",
+     "PXD046467",
+     "PXD030607",
+     "PXD039066",
+     "PXD024043"
+    ],
+    "msagent": [
+     "PXD016921",
+     "PXD019958",
+     "PXD027135",
+     "PXD053023",
+     "PXD074900",
+     "PXD043473",
+     "PXD046467",
+     "PXD030607",
+     "PXD006905",
+     "PXD039066"
+    ]
+   },
+   "seconds": {
+    "bm25": 0.0,
+    "semantic": 0.0,
+    "hybrid": 0.0,
+    "msagent": 0.64
+   }
+  },
+  {
+   "id": "ecoli_lfq_qexactive",
+   "question": "E. coli label-free proteomics on a Q Exactive",
+   "gold_rule": "E. coli; label-free runs; Q Exactive family",
+   "n_gold": 260,
+   "scores": {
+    "bm25": {
+     "recall@10": 0.9,
+     "recall@50": 0.96,
+     "precision@10": 0.9,
+     "mrr": 0.5
+    },
+    "semantic": {
+     "recall@10": 0.6,
+     "recall@50": 0.26,
+     "precision@10": 0.6,
+     "mrr": 1.0
+    },
+    "hybrid": {
+     "recall@10": 1.0,
+     "recall@50": 0.62,
+     "precision@10": 1.0,
+     "mrr": 1.0
+    },
+    "msagent": {
+     "recall@10": 1.0,
+     "recall@50": 1.0,
+     "precision@10": 1.0,
+     "mrr": 1.0
+    }
+   },
+   "top": {
+    "bm25": [
+     "PXD063732",
+     "PXD046389",
+     "PXD022239",
+     "PXD007651",
+     "PXD006884",
+     "PXD009000",
+     "PXD007273",
+     "PXD065338",
+     "PXD041767",
+     "PXD024059"
+    ],
+    "semantic": [
+     "PXD006884",
+     "PXD063886",
+     "PXD007651",
+     "PXD009951",
+     "PXD076268",
+     "PXD022239",
+     "PXD000674",
+     "PXD065338",
+     "PXD025587",
+     "PXD053251"
+    ],
+    "hybrid": [
+     "PXD006884",
+     "PXD007651",
+     "PXD022239",
+     "PXD063886",
+     "PXD065338",
+     "PXD007273",
+     "PXD041767",
+     "PXD076268",
+     "PXD005924",
+     "PXD008707"
+    ],
+    "msagent": [
+     "PXD006884",
+     "PXD007651",
+     "PXD022239",
+     "PXD063886",
+     "PXD065338",
+     "PXD007273",
+     "PXD076268",
+     "PXD041767",
+     "PXD005924",
+     "PXD008707"
+    ]
+   },
+   "seconds": {
+    "bm25": 0.0,
+    "semantic": 0.0,
+    "hybrid": 0.0,
+    "msagent": 0.35
+   }
+  },
+  {
+   "id": "ovarian_cancer_tmt",
+   "question": "Ovarian cancer tumour tissue profiled with TMT",
+   "gold_rule": "ovarian cancer disease annotation; TMT labels",
+   "n_gold": 2,
+   "scores": {
+    "bm25": {
+     "recall@10": 0.5,
+     "recall@50": 1.0,
+     "precision@10": 0.1,
+     "mrr": 0.5
+    },
+    "semantic": {
+     "recall@10": 0.0,
+     "recall@50": 0.5,
+     "precision@10": 0.0,
+     "mrr": 0.0333
+    },
+    "hybrid": {
+     "recall@10": 0.5,
+     "recall@50": 1.0,
+     "precision@10": 0.1,
+     "mrr": 0.5
+    },
+    "msagent": {
+     "recall@10": 1.0,
+     "recall@50": 1.0,
+     "precision@10": 0.2,
+     "mrr": 1.0
+    }
+   },
+   "top": {
+    "bm25": [
+     "PXD011444",
+     "PXD013066",
+     "PXD027341",
+     "PXD069159",
+     "PXD032266",
+     "PXD011799",
+     "PXD033232",
+     "PXD014242",
+     "PXD041990",
+     "PXD004998"
+    ],
+    "semantic": [
+     "PXD051478",
+     "PXD069282",
+     "PXD024444",
+     "PXD058817",
+     "PXD060847",
+     "PXD027177",
+     "PXD071897",
+     "PXD007971",
+     "PXD038152",
+     "PXD008579"
+    ],
+    "hybrid": [
+     "PXD027177",
+     "PXD013066",
+     "PXD014242",
+     "PXD038152",
+     "PXD044554",
+     "PXD061705",
+     "PXD011444",
+     "PXD051478",
+     "PXD069282",
+     "PXD027341"
+    ],
+    "msagent": [
+     "PXD013066",
+     "PMID33086064",
+     "PXD008832",
+     "PXD010437",
+     "PXD030450",
+     "PXD069282",
+     "PXD000001",
+     "PXD015575",
+     "PXD030650",
+     "PXD014502"
+    ]
+   },
+   "seconds": {
+    "bm25": 0.0,
+    "semantic": 0.01,
+    "hybrid": 0.01,
+    "msagent": 0.86
+   }
+  },
+  {
+   "id": "breast_cancer_dia",
+   "question": "Breast cancer proteomics with DIA / SWATH acquisition",
+   "gold_rule": "breast cancer disease annotation; data-independent runs",
+   "n_gold": 50,
+   "scores": {
+    "bm25": {
+     "recall@10": 0.6,
+     "recall@50": 0.46,
+     "precision@10": 0.6,
+     "mrr": 0.2
+    },
+    "semantic": {
+     "recall@10": 0.0,
+     "recall@50": 0.1,
+     "precision@10": 0.0,
+     "mrr": 0.0667
+    },
+    "hybrid": {
+     "recall@10": 0.4,
+     "recall@50": 0.36,
+     "precision@10": 0.4,
+     "mrr": 0.3333
+    },
+    "msagent": {
+     "recall@10": 1.0,
+     "recall@50": 0.72,
+     "precision@10": 1.0,
+     "mrr": 1.0
+    }
+   },
+   "top": {
+    "bm25": [
+     "PXD008927",
+     "PXD016567",
+     "PXD048998",
+     "PXD005766",
+     "PXD028335",
+     "PXD024293",
+     "PXD016688",
+     "PXD049409",
+     "PXD066496",
+     "PXD055157"
+    ],
+    "semantic": [
+     "PXD048998",
+     "PXD037902",
+     "PXD066161",
+     "PXD004776",
+     "PXD034818",
+     "PXD039414",
+     "PXD005172",
+     "PXD005077",
+     "PXD067073",
+     "PXD078909"
+    ],
+    "hybrid": [
+     "PXD048998",
+     "PXD008927",
+     "PXD016688",
+     "PXD024293",
+     "PXD049409",
+     "PXD009488",
+     "PXD016567",
+     "PXD037902",
+     "PXD066161",
+     "PXD005766"
+    ],
+    "msagent": [
+     "PXD016688",
+     "PXD024293",
+     "PXD037428",
+     "PXD028335",
+     "PXD037609",
+     "PXD032266",
+     "PXD003278",
+     "PXD021491",
+     "PXD059920",
+     "PXD004701"
+    ]
+   },
+   "seconds": {
+    "bm25": 0.0,
+    "semantic": 0.0,
+    "hybrid": 0.0,
+    "msagent": 0.74
+   }
+  }
+ ]
+}
