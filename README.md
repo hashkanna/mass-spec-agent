@@ -4,7 +4,9 @@
 
 Mass-Spec Agent helps researchers select reusable public proteomics datasets (PRIDE / ProteomeXchange). It translates a question into explicit criteria and checks the supported criteria against each study's sample annotations. Each check comes back **confirmed**, **excluded** or **unknown**, with the SDRF value that decided it, so missing information stays visible. It keeps patients, biological samples, runs and files distinct, and exports a sample-to-file manifest for downstream analysis. Spectra are never downloaded; only metadata and file locations are indexed. This is a hackathon prototype: see [What is verified](#what-is-verified) for its scope.
 
-![Cohort search](docs/screenshot-cohort-search.png)
+[![Demo video: one liver-cohort question taken from criteria to evidence to files](docs/demo-poster.jpg)](docs/mass-spec-agent-demo.mp4)
+
+**[▶ Watch the 79-second demo](docs/mass-spec-agent-demo.mp4)**: one liver-cohort question, from explicit criteria to sample-level evidence, an unknown result, patient 3's files and the exported manifest.
 
 ## Why this and not keyword search
 
