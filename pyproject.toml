@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "Mass-Spec Agent: describe the experiment you want, get a defensible cohort of public proteomics samples and files, with evidence."
 readme = "README.md"
 requires-python = ">=3.10"
+license = { text = "Apache-2.0" }
 dependencies = [
     "duckdb>=1.1",
     "numpy>=1.26",
