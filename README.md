@@ -2,7 +2,7 @@
 
 **Describe the experiment you want to run; get a defensible selection of public proteomics datasets, samples and files, with the evidence for why each one belongs.**
 
-Mass-Spec Agent is a cohort-selection agent for public mass-spectrometry data (PRIDE / ProteomeXchange). It does not stop at "here are some relevant datasets". It turns your question into explicit criteria, then checks every candidate study against each criterion at the level of individual samples. Each check comes back **confirmed**, **excluded** or **unknown**, with the SDRF value that decided it. It keeps patients, biological samples, runs and files distinct, and it exports a sample-to-file manifest you can feed into a pipeline. Spectra are never downloaded; only metadata and file locations are indexed.
+Mass-Spec Agent helps researchers select reusable public proteomics datasets (PRIDE / ProteomeXchange). It translates a question into explicit criteria and checks the supported criteria against each study's sample annotations. Each check comes back **confirmed**, **excluded** or **unknown**, with the SDRF value that decided it, so missing information stays visible. It keeps patients, biological samples, runs and files distinct, and exports a sample-to-file manifest for downstream analysis. Spectra are never downloaded; only metadata and file locations are indexed. This is a hackathon prototype: see [What is verified](#what-is-verified) for its scope.
 
 ![Cohort search](docs/screenshot-cohort-search.png)
 
@@ -68,6 +68,24 @@ $ msagent manifest PXD002171 PXD013057 -q "liver tumour with paired non-tumour t
 ```
 
 The TSV has one row per sample × data file, with group, the evidence for the group, individual, fraction, label channel, instrument, download URL (and where the URL came from) and key characteristics. Its header records the query, the per-criterion verdicts and the exact SDRF commit used.
+
+## What is verified
+
+The agent checks these criteria against sample annotations and shows the deciding value:
+
+| Criterion | How it is checked |
+|---|---|
+| Organism, tissue / biofluid, disease, cell type, named cell line | Sample characteristics and factor values, through small synonym tables (e.g. `blood plasma` = `plasma`, not `plasma membrane`) |
+| Tumour vs normal, disease vs control | Each sample is assigned a group from its annotations; both groups must be present |
+| Treated vs control | Treated and control samples must both be present; a named treatment ("treated with aspirin") must appear in the treated samples' annotations |
+| Mutant vs wild type | Genotype annotations must include wild type and a non-wild-type genotype |
+| Pairing, number of patients | Patients are counted from the individual annotation; a paired cohort keeps only patients with samples in both groups |
+| No cell lines | Cell-line, Cellosaurus and material-type annotations, known cell-line names, and a HeLa heuristic |
+| Instrument, labelling (incl. TMT plex), acquisition (DDA/DIA) | Judged on the same runs: each is checked on the runs that passed the previous ones |
+| PTM focus | Confirmed only when an enrichment step is annotated; a PTM that was only searched for stays unknown |
+| Raw files mapped, curator-flagged deposits | SDRF data-file column and the curators' known-issues list |
+
+Not verified yet, so not to be relied on: the specific gene in a knockout (only knockout vs wild type is checked), doses and time points, sex and age filters, and whether files still exist on the FTP server (needs `msagent enrich`). Publication dates are known for about 19% of studies.
 
 ## How it works
 
@@ -141,25 +159,25 @@ msagent bench [--pride-live]    run the benchmark (optionally against PRIDE's li
 msagent status                  provenance of the current index
 ```
 
-## Benchmark
+## Internal evaluation
 
-`benchmarks/queries.yaml` has 19 natural-language questions. Each has a hand-written SQL rule over the raw SDRF values that defines its gold studies. `msagent bench` scores four systems over the same 12,164 studies:
+This is an internal prototype evaluation, not a validated accuracy figure. `benchmarks/queries.yaml` has 19 natural-language questions. Each has a hand-written SQL rule over the raw SDRF values that defines its gold studies. `msagent bench` scores four retrieval approaches over the same 12,164 studies:
 
-| System | Recall@10 | Recall@50 | Precision@10 | MRR |
-|---|---|---|---|---|
-| Keyword search (BM25 over per-study metadata) | 0.43 | 0.60 | 0.32 | 0.53 |
-| Semantic search (embeddings only) | 0.12 | 0.18 | 0.11 | 0.26 |
-| Hybrid keyword + semantic | 0.32 | 0.48 | 0.27 | 0.51 |
-| **Mass-Spec Agent** | **0.97** | **0.93** | **0.73** | **1.00** |
+| Approach | Recall@10 (normalised) | Recall@10 (standard) | Recall@50 (normalised) | Precision@10 | MRR |
+|---|---|---|---|---|---|
+| Keyword search (BM25 over per-study metadata) | 0.43 | 0.25 | 0.60 | 0.32 | 0.53 |
+| Semantic search (embeddings only) | 0.12 | 0.06 | 0.18 | 0.11 | 0.26 |
+| Hybrid keyword + semantic | 0.32 | 0.16 | 0.48 | 0.27 | 0.51 |
+| Mass-Spec Agent | 0.97 | 0.61 | 0.93 | 0.73 | 1.00 |
 
-Per-question results are in `benchmarks/results.json` and in the UI's Benchmark tab. Recall@k is normalised by min(k, |gold|).
+"Recall@10 (normalised)" divides the gold studies found in the top 10 by min(10, number of gold studies), so a question with 50 gold studies can still score 1.0. "Recall@10 (standard)" divides by the full number of gold studies. Per-question results are in `benchmarks/results.json` and in the UI's Benchmark tab.
 
-Read these numbers with the caveats:
+Limits of this evaluation:
 
-* **The gold sets are rule-defined, not expert-judged.** They test whether a question is turned into the right structured selection. Because the agent filters on the same SDRF fields the rules use, part of its advantage is by construction. What the comparison does show is the value of interpreting questions into structured, verified filters rather than text similarity over the same metadata. A proteomics researcher should review a set of real questions; `must_include` in the YAML is there for reviewed accessions.
+* **The gold sets are rule-defined, not expert-judged.** They test whether a question is turned into the right structured selection. The agent filters on the same SDRF fields the rules use, so part of its lead is by construction. The comparison shows the gain from structured, verified filters over text search on the same metadata. It does not show accuracy against expert judgement. `must_include` in the YAML is there for researcher-reviewed accessions.
 * **Not a blind test.** The questions were written while the system was being built.
-* **The baselines are stand-ins.** "Keyword" is BM25 over our own per-study documents, not PRIDE's production search. `msagent bench --pride-live` scores PRIDE's real search API, but `www.ebi.ac.uk` was not reachable from the environment this was built in, so that column has not been run yet. The semantic baseline uses the small offline WordLlama model; a stronger embedder would do better.
-* **Precision@10 below 1** is partly deliberate: when few studies qualify, the agent shows near misses with their exclusion reasons.
+* **The baselines are stand-ins.** "Keyword" is BM25 over our own per-study documents, not PRIDE's production search, so this is not a comparison with PRIDE. `msagent bench --pride-live` scores PRIDE's real search API but has not been run, because `www.ebi.ac.uk` was not reachable from the build environment. The semantic baseline uses a small offline embedding model.
+* **Precision@10 below 1** is partly deliberate: when few studies qualify, the agent also lists near misses with their exclusion reasons.
 
 ![Benchmark](docs/screenshot-benchmark.png)
 
@@ -197,5 +215,5 @@ The difference here is not "an LLM in front of PRIDE". It is **criterion-level v
 
 ```bash
 uv pip install -e ".[all]"
-python -m pytest -q        # 16 tests on a synthetic SDRF corpus; no network or full build needed
+python -m pytest -q        # 19 tests on a synthetic SDRF corpus; no network or full build needed
 ```

@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-17T12:03:16+00:00",
+ "generated_at": "2026-10-18T08:43:27+00:00",
  "note": "Gold studies are defined by explicit SQL rules over the raw curated SDRF values (sample_attributes, assays, modifications), written by hand and independently of msagent's vocabulary. They measure whether a natural-language question is turned into the right structured selection, compared with text retrieval over the same per-study metadata. They are not expert relevance judgments, and the questions were written while msagent was being built, so this is not a blind test. Add researcher-reviewed accessions under must_include to strengthen it.",
  "index": {
   "sdrf_commit": "2f0c42d055052a83274dcfa7ec417ae7da300f10 2026-10-17T11:25:29+01:00",
@@ -26,24 +26,28 @@
  "aggregate": {
   "bm25": {
    "recall@10": 0.4263,
+   "standard_recall@10": 0.2543,
    "recall@50": 0.5989,
    "precision@10": 0.3158,
    "mrr": 0.5321
   },
   "semantic": {
    "recall@10": 0.1237,
+   "standard_recall@10": 0.0623,
    "recall@50": 0.178,
    "precision@10": 0.1053,
    "mrr": 0.2636
   },
   "hybrid": {
    "recall@10": 0.3237,
+   "standard_recall@10": 0.1597,
    "recall@50": 0.4754,
    "precision@10": 0.2684,
    "mrr": 0.5084
   },
   "msagent": {
    "recall@10": 0.9684,
+   "standard_recall@10": 0.6122,
    "recall@50": 0.9285,
    "precision@10": 0.7316,
    "mrr": 1.0
@@ -59,24 +63,28 @@
     "bm25": {
      "recall@10": 0.0,
      "recall@50": 0.0,
+     "standard_recall@10": 0.0,
      "precision@10": 0.0,
      "mrr": 0.0
     },
     "semantic": {
      "recall@10": 0.0,
      "recall@50": 0.0,
+     "standard_recall@10": 0.0,
      "precision@10": 0.0,
      "mrr": 0.0
     },
     "hybrid": {
      "recall@10": 0.0,
      "recall@50": 0.0,
+     "standard_recall@10": 0.0,
      "precision@10": 0.0,
      "mrr": 0.0
     },
     "msagent": {
      "recall@10": 1.0,
      "recall@50": 1.0,
+     "standard_recall@10": 1.0,
      "precision@10": 0.3,
      "mrr": 1.0
     }
@@ -133,9 +141,9 @@
    },
    "seconds": {
     "bm25": 0.01,
-    "semantic": 0.36,
-    "hybrid": 0.0,
-    "msagent": 2.37
+    "semantic": 0.45,
+    "hybrid": 0.01,
+    "msagent": 3.26
    }
   },
   {
@@ -147,24 +155,28 @@
     "bm25": {
      "recall@10": 0.5,
      "recall@50": 1.0,
+     "standard_recall@10": 0.5,
      "precision@10": 0.2,
      "mrr": 1.0
     },
     "semantic": {
      "recall@10": 0.25,
      "recall@50": 0.25,
+     "standard_recall@10": 0.25,
      "precision@10": 0.1,
      "mrr": 1.0
     },
     "hybrid": {
      "recall@10": 0.25,
      "recall@50": 0.5,
+     "standard_recall@10": 0.25,
      "precision@10": 0.1,
      "mrr": 1.0
     },
     "msagent": {
      "recall@10": 1.0,
      "recall@50": 1.0,
+     "standard_recall@10": 1.0,
      "precision@10": 0.4,
      "mrr": 1.0
     }
@@ -223,7 +235,7 @@
     "bm25": 0.0,
     "semantic": 0.0,
     "hybrid": 0.0,
-    "msagent": 1.6
+    "msagent": 2.68
    }
   },
   {
@@ -235,24 +247,28 @@
     "bm25": {
      "recall@10": 1.0,
      "recall@50": 1.0,
+     "standard_recall@10": 1.0,
      "precision@10": 0.1,
      "mrr": 0.125
     },
     "semantic": {
      "recall@10": 0.0,
      "recall@50": 0.0,
+     "standard_recall@10": 0.0,
      "precision@10": 0.0,
      "mrr": 0.0
     },
     "hybrid": {
      "recall@10": 0.0,
      "recall@50": 1.0,
+     "standard_recall@10": 0.0,
      "precision@10": 0.0,
      "mrr": 0.0556
     },
     "msagent": {
      "recall@10": 1.0,
      "recall@50": 1.0,
+     "standard_recall@10": 1.0,
      "precision@10": 0.1,
      "mrr": 1.0
     }
@@ -311,7 +327,7 @@
     "bm25": 0.0,
     "semantic": 0.0,
     "hybrid": 0.0,
-    "msagent": 1.85
+    "msagent": 2.43
    }
   },
   {
@@ -323,24 +339,28 @@
     "bm25": {
      "recall@10": 0.7,
      "recall@50": 0.9091,
+     "standard_recall@10": 0.6364,
      "precision@10": 0.7,
      "mrr": 1.0
     },
     "semantic": {
      "recall@10": 0.3,
      "recall@50": 0.2727,
+     "standard_recall@10": 0.2727,
      "precision@10": 0.3,
      "mrr": 0.2
     },
     "hybrid": {
      "recall@10": 0.3,
      "recall@50": 0.9091,
+     "standard_recall@10": 0.2727,
      "precision@10": 0.3,
      "mrr": 1.0
     },
     "msagent": {
      "recall@10": 0.8,
      "recall@50": 0.7273,
+     "standard_recall@10": 0.7273,
      "precision@10": 0.8,
      "mrr": 1.0
     }
@@ -397,9 +417,9 @@
    },
    "seconds": {
     "bm25": 0.0,
-    "semantic": 0.0,
-    "hybrid": 0.0,
-    "msagent": 1.13
+    "semantic": 0.01,
+    "hybrid": 0.01,
+    "msagent": 1.25
    }
   },
   {
@@ -411,24 +431,28 @@
     "bm25": {
      "recall@10": 0.0,
      "recall@50": 0.6,
+     "standard_recall@10": 0.0,
      "precision@10": 0.0,
      "mrr": 0.0345
     },
     "semantic": {
      "recall@10": 0.0,
      "recall@50": 0.0,
+     "standard_recall@10": 0.0,
      "precision@10": 0.0,
      "mrr": 0.0
     },
     "hybrid": {
      "recall@10": 0.0,
      "recall@50": 0.2,
+     "standard_recall@10": 0.0,
      "precision@10": 0.0,
      "mrr": 0.0204
     },
     "msagent": {
      "recall@10": 1.0,
      "recall@50": 1.0,
+     "standard_recall@10": 1.0,
      "precision@10": 0.5,
      "mrr": 1.0
     }
@@ -485,9 +509,9 @@
    },
    "seconds": {
     "bm25": 0.0,
-    "semantic": 0.0,
+    "semantic": 0.01,
     "hybrid": 0.0,
-    "msagent": 1.5
+    "msagent": 1.92
    }
   },
   {
@@ -499,24 +523,28 @@
     "bm25": {
      "recall@10": 0.2,
      "recall@50": 0.8,
+     "standard_recall@10": 0.2,
      "precision@10": 0.1,
      "mrr": 0.3333
     },
     "semantic": {
      "recall@10": 0.2,
      "recall@50": 0.6,
+     "standard_recall@10": 0.2,
      "precision@10": 0.1,
      "mrr": 0.125
     },
     "hybrid": {
      "recall@10": 0.6,
      "recall@50": 0.8,
+     "standard_recall@10": 0.6,
      "precision@10": 0.3,
      "mrr": 0.25
     },
     "msagent": {
      "recall@10": 1.0,
      "recall@50": 1.0,
+     "standard_recall@10": 1.0,
      "precision@10": 0.5,
      "mrr": 1.0
     }
@@ -575,7 +603,7 @@
     "bm25": 0.0,
     "semantic": 0.0,
     "hybrid": 0.0,
-    "msagent": 1.13
+    "msagent": 1.23
    }
   },
   {
@@ -587,24 +615,28 @@
     "bm25": {
      "recall@10": 0.4,
      "recall@50": 0.0851,
+     "standard_recall@10": 0.0851,
      "precision@10": 0.4,
      "mrr": 1.0
     },
     "semantic": {
      "recall@10": 0.0,
      "recall@50": 0.0638,
+     "standard_recall@10": 0.0,
      "precision@10": 0.0,
      "mrr": 0.0714
     },
     "hybrid": {
      "recall@10": 0.4,
      "recall@50": 0.1064,
+     "standard_recall@10": 0.0851,
      "precision@10": 0.4,
      "mrr": 0.3333
     },
     "msagent": {
      "recall@10": 1.0,
      "recall@50": 1.0,
+     "standard_recall@10": 0.2128,
      "precision@10": 1.0,
      "mrr": 1.0
     }
@@ -663,7 +695,7 @@
     "bm25": 0.0,
     "semantic": 0.0,
     "hybrid": 0.0,
-    "msagent": 0.37
+    "msagent": 0.51
    }
   },
   {
@@ -675,24 +707,28 @@
     "bm25": {
      "recall@10": 0.4,
      "recall@50": 0.6364,
+     "standard_recall@10": 0.1818,
      "precision@10": 0.4,
      "mrr": 1.0
     },
     "semantic": {
      "recall@10": 0.1,
      "recall@50": 0.3182,
+     "standard_recall@10": 0.0455,
      "precision@10": 0.1,
      "mrr": 0.2
     },
     "hybrid": {
      "recall@10": 0.5,
      "recall@50": 0.4545,
+     "standard_recall@10": 0.2273,
      "precision@10": 0.5,
      "mrr": 0.5
     },
     "msagent": {
      "recall@10": 1.0,
      "recall@50": 1.0,
+     "standard_recall@10": 0.4545,
      "precision@10": 1.0,
      "mrr": 1.0
     }
@@ -751,7 +787,7 @@
     "bm25": 0.0,
     "semantic": 0.0,
     "hybrid": 0.0,
-    "msagent": 0.88
+    "msagent": 1.03
    }
   },
   {
@@ -763,24 +799,28 @@
     "bm25": {
      "recall@10": 0.4,
      "recall@50": 0.9444,
+     "standard_recall@10": 0.2222,
      "precision@10": 0.4,
      "mrr": 0.25
     },
     "semantic": {
      "recall@10": 0.1,
      "recall@50": 0.1111,
+     "standard_recall@10": 0.0556,
      "precision@10": 0.1,
      "mrr": 0.125
     },
     "hybrid": {
      "recall@10": 0.2,
      "recall@50": 0.8333,
+     "standard_recall@10": 0.1111,
      "precision@10": 0.2,
      "mrr": 0.3333
     },
     "msagent": {
      "recall@10": 1.0,
      "recall@50": 1.0,
+     "standard_recall@10": 0.5556,
      "precision@10": 1.0,
      "mrr": 1.0
     }
@@ -839,7 +879,7 @@
     "bm25": 0.0,
     "semantic": 0.0,
     "hybrid": 0.0,
-    "msagent": 1.41
+    "msagent": 1.53
    }
   },
   {
@@ -851,24 +891,28 @@
     "bm25": {
      "recall@10": 0.3,
      "recall@50": 0.5714,
+     "standard_recall@10": 0.2143,
      "precision@10": 0.3,
      "mrr": 0.1667
     },
     "semantic": {
      "recall@10": 0.1,
      "recall@50": 0.2143,
+     "standard_recall@10": 0.0714,
      "precision@10": 0.1,
      "mrr": 0.5
     },
     "hybrid": {
      "recall@10": 0.3,
      "recall@50": 0.5,
+     "standard_recall@10": 0.2143,
      "precision@10": 0.3,
      "mrr": 1.0
     },
     "msagent": {
      "recall@10": 1.0,
      "recall@50": 1.0,
+     "standard_recall@10": 0.7143,
      "precision@10": 1.0,
      "mrr": 1.0
     }
@@ -927,7 +971,7 @@
     "bm25": 0.0,
     "semantic": 0.0,
     "hybrid": 0.0,
-    "msagent": 1.08
+    "msagent": 1.04
    }
   },
   {
@@ -939,24 +983,28 @@
     "bm25": {
      "recall@10": 0.0,
      "recall@50": 0.0,
+     "standard_recall@10": 0.0,
      "precision@10": 0.0,
      "mrr": 0.0
     },
     "semantic": {
      "recall@10": 0.0,
      "recall@50": 0.0556,
+     "standard_recall@10": 0.0,
      "precision@10": 0.0,
      "mrr": 0.0263
     },
     "hybrid": {
      "recall@10": 0.0,
      "recall@50": 0.0,
+     "standard_recall@10": 0.0,
      "precision@10": 0.0,
      "mrr": 0.0
     },
     "msagent": {
      "recall@10": 1.0,
      "recall@50": 0.7778,
+     "standard_recall@10": 0.5556,
      "precision@10": 1.0,
      "mrr": 1.0
     }
@@ -1015,7 +1063,7 @@
     "bm25": 0.0,
     "semantic": 0.0,
     "hybrid": 0.0,
-    "msagent": 0.71
+    "msagent": 0.89
    }
   },
   {
@@ -1027,24 +1075,28 @@
     "bm25": {
      "recall@10": 0.4,
      "recall@50": 0.381,
+     "standard_recall@10": 0.1905,
      "precision@10": 0.4,
      "mrr": 1.0
     },
     "semantic": {
      "recall@10": 0.0,
      "recall@50": 0.0952,
+     "standard_recall@10": 0.0,
      "precision@10": 0.0,
      "mrr": 0.0833
     },
     "hybrid": {
      "recall@10": 0.2,
      "recall@50": 0.2381,
+     "standard_recall@10": 0.0952,
      "precision@10": 0.2,
      "mrr": 1.0
     },
     "msagent": {
      "recall@10": 0.6,
      "recall@50": 0.8571,
+     "standard_recall@10": 0.2857,
      "precision@10": 0.6,
      "mrr": 1.0
     }
@@ -1103,7 +1155,7 @@
     "bm25": 0.0,
     "semantic": 0.0,
     "hybrid": 0.0,
-    "msagent": 1.21
+    "msagent": 1.43
    }
   },
   {
@@ -1115,24 +1167,28 @@
     "bm25": {
      "recall@10": 0.1,
      "recall@50": 0.0909,
+     "standard_recall@10": 0.0303,
      "precision@10": 0.1,
      "mrr": 1.0
     },
     "semantic": {
      "recall@10": 0.0,
      "recall@50": 0.1212,
+     "standard_recall@10": 0.0,
      "precision@10": 0.0,
      "mrr": 0.0769
     },
     "hybrid": {
      "recall@10": 0.1,
      "recall@50": 0.0909,
+     "standard_recall@10": 0.0303,
      "precision@10": 0.1,
      "mrr": 0.3333
     },
     "msagent": {
      "recall@10": 1.0,
      "recall@50": 1.0,
+     "standard_recall@10": 0.303,
      "precision@10": 1.0,
      "mrr": 1.0
     }
@@ -1191,7 +1247,7 @@
     "bm25": 0.0,
     "semantic": 0.0,
     "hybrid": 0.0,
-    "msagent": 0.4
+    "msagent": 0.45
    }
   },
   {
@@ -1203,24 +1259,28 @@
     "bm25": {
      "recall@10": 0.0,
      "recall@50": 0.0,
+     "standard_recall@10": 0.0,
      "precision@10": 0.0,
      "mrr": 0.0
     },
     "semantic": {
      "recall@10": 0.0,
      "recall@50": 0.0,
+     "standard_recall@10": 0.0,
      "precision@10": 0.0,
      "mrr": 0.0
     },
     "hybrid": {
      "recall@10": 0.0,
      "recall@50": 0.0,
+     "standard_recall@10": 0.0,
      "precision@10": 0.0,
      "mrr": 0.0
     },
     "msagent": {
      "recall@10": 1.0,
      "recall@50": 1.0,
+     "standard_recall@10": 0.4545,
      "precision@10": 1.0,
      "mrr": 1.0
     }
@@ -1272,14 +1332,14 @@
      "PXD083651",
      "PXD023099",
      "PXD052706",
-     "PXD013482"
+     "PXD005931"
     ]
    },
    "seconds": {
     "bm25": 0.0,
     "semantic": 0.0,
     "hybrid": 0.0,
-    "msagent": 0.36
+    "msagent": 0.39
    }
   },
   {
@@ -1291,24 +1351,28 @@
     "bm25": {
      "recall@10": 0.8,
      "recall@50": 1.0,
+     "standard_recall@10": 0.8,
      "precision@10": 0.4,
      "mrr": 1.0
     },
     "semantic": {
      "recall@10": 0.2,
      "recall@50": 0.2,
+     "standard_recall@10": 0.2,
      "precision@10": 0.1,
      "mrr": 0.5
     },
     "hybrid": {
      "recall@10": 0.4,
      "recall@50": 0.8,
+     "standard_recall@10": 0.4,
      "precision@10": 0.2,
      "mrr": 1.0
     },
     "msagent": {
      "recall@10": 1.0,
      "recall@50": 1.0,
+     "standard_recall@10": 1.0,
      "precision@10": 0.5,
      "mrr": 1.0
     }
@@ -1365,9 +1429,9 @@
    },
    "seconds": {
     "bm25": 0.0,
-    "semantic": 0.0,
+    "semantic": 0.01,
     "hybrid": 0.0,
-    "msagent": 0.76
+    "msagent": 1.14
    }
   },
   {
@@ -1379,24 +1443,28 @@
     "bm25": {
      "recall@10": 0.9,
      "recall@50": 0.94,
+     "standard_recall@10": 0.1169,
      "precision@10": 0.9,
      "mrr": 1.0
     },
     "semantic": {
      "recall@10": 0.5,
      "recall@50": 0.22,
+     "standard_recall@10": 0.0649,
      "precision@10": 0.5,
      "mrr": 1.0
     },
     "hybrid": {
      "recall@10": 1.0,
      "recall@50": 0.62,
+     "standard_recall@10": 0.1299,
      "precision@10": 1.0,
      "mrr": 1.0
     },
     "msagent": {
      "recall@10": 1.0,
      "recall@50": 0.56,
+     "standard_recall@10": 0.1299,
      "precision@10": 1.0,
      "mrr": 1.0
     }
@@ -1455,7 +1523,7 @@
     "bm25": 0.0,
     "semantic": 0.0,
     "hybrid": 0.0,
-    "msagent": 0.64
+    "msagent": 0.9
    }
   },
   {
@@ -1467,24 +1535,28 @@
     "bm25": {
      "recall@10": 0.9,
      "recall@50": 0.96,
+     "standard_recall@10": 0.0346,
      "precision@10": 0.9,
      "mrr": 0.5
     },
     "semantic": {
      "recall@10": 0.6,
      "recall@50": 0.26,
+     "standard_recall@10": 0.0231,
      "precision@10": 0.6,
      "mrr": 1.0
     },
     "hybrid": {
      "recall@10": 1.0,
      "recall@50": 0.62,
+     "standard_recall@10": 0.0385,
      "precision@10": 1.0,
      "mrr": 1.0
     },
     "msagent": {
      "recall@10": 1.0,
      "recall@50": 1.0,
+     "standard_recall@10": 0.0385,
      "precision@10": 1.0,
      "mrr": 1.0
     }
@@ -1543,7 +1615,7 @@
     "bm25": 0.0,
     "semantic": 0.0,
     "hybrid": 0.0,
-    "msagent": 0.35
+    "msagent": 0.45
    }
   },
   {
@@ -1555,24 +1627,28 @@
     "bm25": {
      "recall@10": 0.5,
      "recall@50": 1.0,
+     "standard_recall@10": 0.5,
      "precision@10": 0.1,
      "mrr": 0.5
     },
     "semantic": {
      "recall@10": 0.0,
      "recall@50": 0.5,
+     "standard_recall@10": 0.0,
      "precision@10": 0.0,
      "mrr": 0.0333
     },
     "hybrid": {
      "recall@10": 0.5,
      "recall@50": 1.0,
+     "standard_recall@10": 0.5,
      "precision@10": 0.1,
      "mrr": 0.5
     },
     "msagent": {
      "recall@10": 1.0,
      "recall@50": 1.0,
+     "standard_recall@10": 1.0,
      "precision@10": 0.2,
      "mrr": 1.0
     }
@@ -1629,9 +1705,9 @@
    },
    "seconds": {
     "bm25": 0.0,
-    "semantic": 0.01,
-    "hybrid": 0.01,
-    "msagent": 0.86
+    "semantic": 0.0,
+    "hybrid": 0.0,
+    "msagent": 1.05
    }
   },
   {
@@ -1643,24 +1719,28 @@
     "bm25": {
      "recall@10": 0.6,
      "recall@50": 0.46,
+     "standard_recall@10": 0.12,
      "precision@10": 0.6,
      "mrr": 0.2
     },
     "semantic": {
      "recall@10": 0.0,
      "recall@50": 0.1,
+     "standard_recall@10": 0.0,
      "precision@10": 0.0,
      "mrr": 0.0667
     },
     "hybrid": {
      "recall@10": 0.4,
      "recall@50": 0.36,
+     "standard_recall@10": 0.08,
      "precision@10": 0.4,
      "mrr": 0.3333
     },
     "msagent": {
      "recall@10": 1.0,
      "recall@50": 0.72,
+     "standard_recall@10": 0.2,
      "precision@10": 1.0,
      "mrr": 1.0
     }
@@ -1717,9 +1797,9 @@
    },
    "seconds": {
     "bm25": 0.0,
-    "semantic": 0.0,
-    "hybrid": 0.0,
-    "msagent": 0.74
+    "semantic": 0.01,
+    "hybrid": 0.01,
+    "msagent": 0.81
    }
   }
  ]

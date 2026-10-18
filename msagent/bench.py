@@ -10,7 +10,7 @@ SDRF values (not through msagent's vocabulary), so the rule is inspectable and e
 * ``pride``     PRIDE's own search API, only with --pride-live and network access to www.ebi.ac.uk
 
 recall@k is hits in the top k divided by min(k, |gold|), so 1.0 is reachable when the gold set is
-larger than k. precision@10 is the share of the (up to) 10 returned studies that are gold.
+larger than k (a normalised variant). standard_recall@10 is hits in the top 10 divided by |gold|. precision@10 is the share of the (up to) 10 returned studies that are gold.
 """
 
 from __future__ import annotations
@@ -53,6 +53,7 @@ def score(ranking: list[str], gold: set[str]) -> dict:
         hits = sum(1 for a in ranking[:k] if a in gold)
         out[f"recall@{k}"] = round(hits / min(k, len(gold)), 4) if gold else 0.0
     top = ranking[:10]
+    out["standard_recall@10"] = round(sum(1 for a in ranking[:10] if a in gold) / len(gold), 4) if gold else 0.0
     out["precision@10"] = round(sum(1 for a in top if a in gold) / len(top), 4) if top else 0.0
     first = next((i for i, a in enumerate(ranking) if a in gold), None)
     out["mrr"] = round(1 / (first + 1), 4) if first is not None else 0.0
@@ -97,7 +98,7 @@ def run(queries_path: str, output_path: str, pride_live: bool = False) -> dict:
             f"{sid}:{entry['scores'][sid]['recall@10']:.2f}/{entry['scores'][sid]['recall@50']:.2f}" for sid, _ in systems), flush=True)
     scored = [r for r in rows if r["n_gold"]]
     aggregate = {
-        sid: {m: round(sum(r["scores"][sid][m] for r in scored) / max(1, len(scored)), 4) for m in ("recall@10", "recall@50", "precision@10", "mrr")}
+        sid: {m: round(sum(r["scores"][sid][m] for r in scored) / max(1, len(scored)), 4) for m in ("recall@10", "standard_recall@10", "recall@50", "precision@10", "mrr")}
         for sid, _ in systems
     }
     result = {
@@ -112,5 +113,5 @@ def run(queries_path: str, output_path: str, pride_live: bool = False) -> dict:
     print("\nmean over", len(scored), "questions:")
     for sid, label in systems:
         a = aggregate[sid]
-        print(f"  {label:<28} recall@10 {a['recall@10']:.2f}  recall@50 {a['recall@50']:.2f}  precision@10 {a['precision@10']:.2f}  MRR {a['mrr']:.2f}")
+        print(f"  {label:<28} recall@10 {a['recall@10']:.2f}  std-recall@10 {a['standard_recall@10']:.2f}  recall@50 {a['recall@50']:.2f}  precision@10 {a['precision@10']:.2f}  MRR {a['mrr']:.2f}")
     return result

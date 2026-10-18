@@ -360,14 +360,14 @@ async function loadBench() {
   let b;
   try { b = await api("/api/benchmark"); } catch (e) { box.innerHTML = `<span class="muted">${esc(e.message)}</span>`; return; }
   const sys = b.systems;
-  const agg = sys.map(s => `<tr><td>${esc(s.label)}</td>${["recall@10", "recall@50", "precision@10", "mrr"].map(m =>
+  const agg = sys.map(s => `<tr><td>${esc(s.label)}</td>${["recall@10", "standard_recall@10", "recall@50", "precision@10", "mrr"].map(m =>
       `<td style="min-width:120px"><div class="small">${(b.aggregate[s.id][m] * 100).toFixed(0)}%</div><div class="benchbar" style="width:${b.aggregate[s.id][m] * 100}%"></div></td>`).join("")}</tr>`).join("");
   const rows = b.queries.map(q => `<tr><td class="small">${esc(q.question)}<div class="muted">${q.n_gold} gold studies · ${esc(q.gold_rule)}</div></td>` +
     sys.map(s => `<td class="small">${(q.scores[s.id]["recall@10"] * 100).toFixed(0)}% / ${(q.scores[s.id]["recall@50"] * 100).toFixed(0)}%</td>`).join("") + `</tr>`).join("");
-  box.innerHTML = `<p class="label">Benchmark · ${b.queries.length} questions · ${esc(b.generated_at)}</p>
+  box.innerHTML = `<p class="label">Internal prototype evaluation · ${b.queries.length} questions · ${esc(b.generated_at)}</p>
     <p class="small muted">${esc(b.note)}</p>
-    <table><thead><tr><th>System</th><th>Recall@10</th><th>Recall@50</th><th>Precision@10</th><th>MRR</th></tr></thead><tbody>${agg}</tbody></table>
-    <p class="label" style="margin-top:18px">Per question (recall@10 / recall@50)</p>
+    <table><thead><tr><th>Approach</th><th>Recall@10 (normalised)</th><th>Recall@10 (standard)</th><th>Recall@50 (normalised)</th><th>Precision@10</th><th>MRR</th></tr></thead><tbody>${agg}</tbody></table>
+    <p class="label" style="margin-top:18px">Per question (normalised recall@10 / recall@50)</p>
     <table><thead><tr><th>Question</th>${sys.map(s => `<th>${esc(s.label)}</th>`).join("")}</tr></thead><tbody>${rows}</tbody></table>`;
 }
 
