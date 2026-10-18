@@ -323,6 +323,20 @@ def verify(pd: ProjectData, c: Criteria) -> dict:
                 role, ev = _role_genotype(s, pd.factor_attrs)
                 s.group = {"mutant": a_name, "wild type": b_name}.get(role or "")
             s.group_evidence = ev if s.group else None
+        other_treatments: Counter = Counter()
+        if c.comparison == "treated_vs_control" and c.compounds:
+            wanted = [vocab.norm(x) for x in c.compounds]
+            treat_attrs = tuple(vocab.TREATMENT_ATTRS) + tuple(a for a in sorted(pd.factor_attrs) if _TREAT_FACTOR.search(a))
+            for s in pool:
+                if s.group != a_name:
+                    continue
+                vals = s.vals(treat_attrs)
+                hit = [f"{a} = {_q(v)}" for a, v in vals if any(w in vocab.norm(v) for w in wanted)]
+                if hit:
+                    s.group_evidence = hit[0]
+                else:
+                    other_treatments[s.group_evidence] += 1
+                    s.group, s.group_evidence = None, None
         ga = [s for s in pool if s.group == a_name]
         gb = [s for s in pool if s.group == b_name]
         groups = {a_name: ga, b_name: gb}
@@ -336,6 +350,8 @@ def verify(pd: ProjectData, c: Criteria) -> dict:
                 ck.hint = "some group assignments inferred from sample names"
             if c.comparison == "tumour_vs_normal" and any("adenoma" in vocab.norm(e or "") and "adenocarcinoma" not in vocab.norm(e or "") for e in ev_a):
                 ck.hint = "tumours annotated as adenoma (benign); check this fits the question"
+        elif not ga and other_treatments:
+            ck = Check("comparison", label, EXCLUDED, f"no samples treated with {', '.join(c.compounds)}; treated samples received {_top(other_treatments, 2)}")
         elif ga or gb:
             present = a_name if ga else b_name
             missing = b_name if ga else a_name
@@ -354,6 +370,13 @@ def verify(pd: ProjectData, c: Criteria) -> dict:
             both = inds_a & inds_b
             if both:
                 ck = Check("paired", "Paired samples", CONFIRMED, f"{len(both)} individuals have both {a_name} and {b_name} samples", source=f"SDRF characteristics[{pd.info.get('individual_column') or 'individual'}]")
+                unpaired = [x for x in ga + gb if x.individual not in both]
+                if unpaired:
+                    ck.detail += f"; {len(unpaired)} samples from unpaired individuals dropped from the cohort"
+                ga = [x for x in ga if x.individual in both]
+                gb = [x for x in gb if x.individual in both]
+                groups = {a_name: ga, b_name: gb}
+                pool = ga + gb
             elif inds_a or inds_b:
                 ck = Check("paired", "Paired samples", EXCLUDED, f"individuals annotated ({len(inds_a | inds_b)}), but none has both {a_name} and {b_name} samples")
             else:
@@ -397,14 +420,18 @@ def verify(pd: ProjectData, c: Criteria) -> dict:
         checks.append(Check("min_samples", f">= {c.min_samples} samples", st, f"{len(cohort)} biological samples match (technical/pooled samples excluded)"))
 
     # ---- technology (judged on the cohort's runs) -----------------------------------------
+    # Each run-level criterion is judged on the runs that passed the previous ones, so the
+    # instrument, labelling and acquisition requirements must all hold on the same runs.
     cohort_names = {s.name for s in cohort}
     runs = [a for a in pd.assays if a["source_name"] in cohort_names] or pd.assays
+    narrowed = False
     if c.instruments:
         subs = [x for i in c.instruments for x in vocab.INSTRUMENT_QUERY.get(i, [vocab.norm(i)])]
         inst = Counter(a["instrument"] for a in runs if a["instrument"] and not vocab.is_missing(a["instrument"]))
         ok = Counter({k: v for k, v in inst.items() if any(x in vocab.norm(k) for x in subs)})
         if ok:
             checks.append(Check("instrument", "Instrument", CONFIRMED, f"{sum(ok.values())}/{len(runs)} runs on {_top(ok)}", source="SDRF comment[instrument]"))
+            runs, narrowed = [a for a in runs if a["instrument"] in ok], True
         elif inst:
             checks.append(Check("instrument", "Instrument", EXCLUDED, f"acquired on {_top(inst)}", source="SDRF comment[instrument]"))
         else:
@@ -425,6 +452,9 @@ def verify(pd: ProjectData, c: Criteria) -> dict:
             if c.tmt_plex and plex and plex != c.tmt_plex:
                 st, det = EXCLUDED, f"{plex}, not {c.tmt_plex}"
             checks.append(Check("label", "Quantification", st, det, source="SDRF comment[label]"))
+            matching = [a for a in runs if vocab.label_type(a["label"]) in ok]
+            if st == CONFIRMED and matching:
+                runs, narrowed = matching, True
         elif lt:
             checks.append(Check("label", "Quantification", EXCLUDED, f"labels: {_top(lt)}", source="SDRF comment[label]"))
         else:
@@ -435,10 +465,19 @@ def verify(pd: ProjectData, c: Criteria) -> dict:
         ok = Counter({k: v for k, v in aq.items() if k in c.acquisition})
         if ok:
             checks.append(Check("acquisition", "Acquisition", CONFIRMED, f"{sum(ok.values())}/{len(runs)} runs: {_top(ok)}", source="SDRF comment[proteomics data acquisition method]"))
+            runs, narrowed = [a for a in runs if vocab.acquisition_type(a["acquisition"]) in ok], True
         elif aq:
-            checks.append(Check("acquisition", "Acquisition", EXCLUDED, f"acquisition: {_top(aq)}"))
+            where = " on the runs that meet the other technical criteria" if narrowed else ""
+            checks.append(Check("acquisition", "Acquisition", EXCLUDED, f"acquisition{where}: {_top(aq)}"))
         else:
             checks.append(Check("acquisition", "Acquisition", UNKNOWN, "acquisition method not annotated"))
+
+    run_ids = None
+    if narrowed:
+        run_ids = {a["row_id"] for a in runs}
+        with_runs = {a["source_name"] for a in runs}
+        cohort = [x for x in cohort if x.name in with_runs]
+        cohort_names = {x.name for x in cohort}
 
     if c.ptms:
         checks.append(_ptm_check(pd, cohort or bio, c.ptms))
@@ -506,7 +545,7 @@ def verify(pd: ProjectData, c: Criteria) -> dict:
     status = "excluded" if n_exc else ("needs review" if n_unk else "qualifies")
     if not cohort and status != "excluded":
         status = "excluded"
-    cohort_runs = [a for a in pd.assays if a["source_name"] in cohort_names]
+    cohort_runs = [a for a in pd.assays if a["source_name"] in cohort_names and (run_ids is None or a["row_id"] in run_ids)]
     files = {a["data_file"] for a in cohort_runs if a["data_file"]}
     group_counts = {g: len(v) for g, v in groups.items()} if groups else {}
     technical = [s for s in samples_all if s.technical]
@@ -532,6 +571,7 @@ def verify(pd: ProjectData, c: Criteria) -> dict:
         "n_excluded": n_exc,
         "counts": counts,
         "design": design_summary(counts),
+        "cohort_rows": sorted(a["row_id"] for a in cohort_runs),
         "cohort": [
             {"sample": s.name, "group": s.group, "group_evidence": s.group_evidence, "individual": s.individual}
             for s in cohort

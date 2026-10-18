@@ -36,6 +36,10 @@ def corpus_rows():
             rows.append(row(f"patient{p}_{kind}", "homo sapiens", "liver", dz, f"patient {p}", NA, NA, NA, NA, "1",
                             f"run_P{p}{kind}", f, f"https://ftp.pride.ebi.ac.uk/pride/data/archive/2021/05/PXD990001/{f}",
                             "1", LF, QE, DDA, CAM, OX, dz))
+    # patient 4 has a tumour sample only: must not enter a paired cohort
+    rows.append(row("patient4_T", "homo sapiens", "liver", "hepatocellular carcinoma", "patient 4", NA, NA, NA, NA, "1",
+                    "run_P4T", "P4_T.raw", "https://ftp.pride.ebi.ac.uk/pride/data/archive/2021/05/PXD990001/P4_T.raw",
+                    "1", LF, QE, DDA, CAM, OX, "hepatocellular carcinoma"))
     data["PXD990001"] = rows
     # 2: liver tumours only, no normal tissue
     data["PXD990002"] = [
@@ -60,6 +64,13 @@ def corpus_rows():
         rows.append(row(f"mouse{i}", "Mus musculus", "hippocampus", "normal", NA, NA, NA, geno, NA, str(i), f"m{i}",
                         f"m{i}.d", "", "1", LF, "NT=timsTOF Pro 2;AC=MS:1003230", DIA, CAM, OX, "normal"))
     data["PXD990004"] = rows
+    # 5: timsTOF runs are DDA, DIA runs are on a Q Exactive: no single run is timsTOF + DIA
+    data["PXD990005"] = [
+        row("plasma1", "homo sapiens", "blood plasma", "normal", "donor 1", NA, NA, NA, NA, "1", "a1", "a1.d", "", "1", LF,
+            "NT=timsTOF Pro;AC=MS:1003005", DDA, CAM, OX, "normal"),
+        row("plasma2", "homo sapiens", "blood plasma", "normal", "donor 2", NA, NA, NA, NA, "1", "a2", "a2.raw", "", "1", LF,
+            QE, DIA, CAM, OX, "normal"),
+    ]
     return data
 
 

@@ -59,6 +59,10 @@ def facet_plan(store: Store, c: Criteria) -> list[tuple[str, set[str], set[str],
         wt = _values_matching(store, ("genotype", "phenotype"), lambda v: bool(vocab.WILDTYPE_RE.search(v)))
         mut = _values_matching(store, ("genotype", "phenotype"), lambda v: not vocab.WILDTYPE_RE.search(v))
         plan.append(("comparison", wt & mut, _annotated(store, ("genotype",)), 0.7))
+    if c.compounds:
+        wanted = [vocab.norm(x) for x in c.compounds]
+        plan.append(("compound", _values_matching(store, ("treatment", "compound"), lambda v: any(w in v for w in wanted)),
+                     _annotated(store, ("treatment", "compound")), 1.0))
     if c.cell_types:
         pats = [CELL_TYPES.get(t) or vocab.TermPattern(t, [t]) for t in c.cell_types]
         plan.append(("cell_type", _values_matching(store, ("cell_type",), lambda v: any(p.matches(v) for p in pats)), _annotated(store, ("cell_type",)), 1.0))
@@ -143,6 +147,7 @@ def find_cohorts(
             continue
         v = verify(pd, c)
         cohort = v.pop("cohort")
+        v.pop("cohort_rows", None)
         results.append(
             {
                 "accession": acc,

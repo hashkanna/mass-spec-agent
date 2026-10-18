@@ -28,9 +28,10 @@ def build_manifest(store: Store, accessions: list[str], criteria: Criteria | str
             continue
         v = verify(pd, c)
         chosen = {x["sample"]: x for x in v["cohort"]}
+        rows_ok = set(v["cohort_rows"])
         for a in pd.assays:
             s = chosen.get(a["source_name"])
-            if s is None:
+            if s is None or a["row_id"] not in rows_ok:
                 continue
             url, src = _url_for(pd, a)
             attrs = pd.samples.get(a["source_name"], {})

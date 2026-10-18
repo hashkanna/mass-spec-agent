@@ -52,6 +52,10 @@ CELL_TYPE_ALIASES = {"t cells": "t cell", "b cells": "b cell", "neurons": "neuro
                      "platelets": "platelet", "stem cells": "stem cell", "ipscs": "stem cell", "ipsc": "stem cell",
                      "pbmcs": "pbmc", "astrocytes": "astrocyte", "keratinocytes": "keratinocyte"}
 
+GENERIC_TREATMENTS = {"drug", "drugs", "compound", "compounds", "inhibitor", "inhibitors", "chemical", "small", "molecule",
+                      "dmso", "vehicle", "mock", "untreated", "control", "controls", "cells", "cell", "being", "been", "were",
+                      "was", "are", "is", "when", "after", "before", "with", "and", "the", "patients", "samples", "line", "lines"}
+
 STOPWORDS = set(
     """a an the and or of in on for with without from to by at as is are be that this these those which what find
     show me give get list want need looking look studies study dataset datasets data project projects experiment
@@ -79,6 +83,7 @@ class Criteria:
     tmt_plex: str | None = None
     acquisition: list[str] = field(default_factory=list)
     ptms: list[str] = field(default_factory=list)
+    compounds: list[str] = field(default_factory=list)  # treatments that treated samples must have received
     comparison: str | None = None  # tumour_vs_normal | disease_vs_control | treated_vs_control | mutant_vs_wildtype
     paired: bool = False
     min_individuals: int | None = None
@@ -123,7 +128,8 @@ class Criteria:
             dz = " or ".join(_disease_label(d) for d in self.diseases) or "disease"
             add("comparison", f"Contains {dz} AND healthy/control samples")
         elif self.comparison == "treated_vs_control":
-            add("comparison", "Contains treated AND control/untreated samples")
+            what = f"treated with {' or '.join(self.compounds)}" if self.compounds else "treated"
+            add("comparison", f"Contains samples {what} AND control/untreated samples")
         elif self.comparison == "mutant_vs_wildtype":
             add("comparison", "Contains mutant/knockout AND wild-type samples")
         if self.paired:
@@ -234,8 +240,18 @@ def parse_query(text: str, known_organisms: list[str] | None = None, today: date
             c.comparison = "treated_vs_control"
     for m in re.finditer(r"\b(knock[- ]?outs?|knock[- ]?downs?|ko|kd|wild[- ]?type|wt|mutants?|deficient|treated|treatment|drug|untreated|vehicle|controls?)\b", t):
         consumed.append(m.span())
+    for pat in (r"treated with ([a-z0-9][a-z0-9\-]+)", r"([a-z0-9][a-z0-9\-]+)[- ]treated", r"([a-z0-9][a-z0-9\-]+) treatment",
+                r"(?:exposed|exposure) to ([a-z0-9][a-z0-9\-]+)", r"([a-z0-9][a-z0-9\-]+) (?:vs\.?|versus|or) (?:dmso|vehicle|control|untreated|mock)"):
+        for m in re.finditer(pat, t):
+            name = m.group(1).strip("-")
+            if name not in STOPWORDS and name not in GENERIC_TREATMENTS and len(name) > 2:
+                c.compounds.append(name)
+                consumed.append(m.span(1))
+    c.compounds = _uniq(c.compounds)
+    if c.compounds and c.comparison not in ("tumour_vs_normal", "disease_vs_control"):
+        c.comparison = "treated_vs_control"
     if re.search(r"\b(knock[- ]?out|knock[- ]?down|ko|kd|wild[- ]?type|wt|mutant|mutants|deficient|null mice)\b", t):
-        if not c.comparison or c.comparison == "treated_vs_control":
+        if not c.comparison or (c.comparison == "treated_vs_control" and not c.compounds):
             c.comparison = "mutant_vs_wildtype"
 
     # ---- counts ----------------------------------------------------------------------
