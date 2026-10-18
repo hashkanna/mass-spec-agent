@@ -180,7 +180,7 @@ function init() {
     b.onclick = () => { $("q").value = ex; run(); };
     $("examples").appendChild(b);
   }
-  $("go").onclick = run;
+  $("go").onclick = () => run();
   $("q").addEventListener("keydown", e => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) run(); });
   document.querySelectorAll("nav button").forEach(b => b.onclick = () => tab(b.dataset.tab));
   $("clearsel").onclick = () => { selected.clear(); document.querySelectorAll(".sel").forEach(x => x.checked = false); updateBar(); };
